@@ -867,6 +867,47 @@
             transform: scale(1.1);
         }
 
+        .admin-login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+        }
+
+        .admin-login-content {
+            background: white;
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .admin-login-content h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .admin-login-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .admin-login-content button {
+            margin: 10px 5px;
+            width: auto;
+            padding: 10px 20px;
+        }
+
         .admin-panel {
             display: none;
             position: fixed;
@@ -1158,8 +1199,20 @@
     </style>
 </head>
 <body>
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="admin-login-modal">
+        <div class="admin-login-content">
+            <h2>Admin Login</h2>
+            <input type="text" id="adminUsername" placeholder="Username">
+            <input type="password" id="adminPassword" placeholder="Password">
+            <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+            <button class="btn btn-danger" onclick="hideAdminLogin()">Cancel</button>
+            <div id="adminLoginError" style="color: red; margin-top: 10px;"></div>
+        </div>
+    </div>
+
     <!-- Admin Access Button -->
-    <button class="admin-access-btn" onclick="showAdminPanel()" title="Admin Panel">
+    <button class="admin-access-btn" onclick="showAdminLogin()" title="Admin Panel">
         <i class="fas fa-cog"></i>
     </button>
 
@@ -1168,8 +1221,8 @@
         <div class="admin-content">
             <div class="admin-header">
                 <h1 class="admin-title">Jigjiga University - Admin Panel</h1>
-                <button class="admin-close" onclick="hideAdminPanel()">
-                    <i class="fas fa-times"></i> Close
+                <button class="admin-close" onclick="adminLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
 
@@ -1179,7 +1232,6 @@
                 <div class="admin-tab" onclick="showTab('studentManagement')">Student Management</div>
                 <div class="admin-tab" onclick="showTab('dataUpload')">Data Upload</div>
                 <div class="admin-tab" onclick="showTab('reports')">Reports</div>
-                <div class="admin-tab" onclick="showTab('system')">System Tools</div>
             </div>
 
             <!-- Dashboard Tab -->
@@ -1189,10 +1241,6 @@
                     <div class="stat-card">
                         <div class="stat-number" id="totalStudents">0</div>
                         <div class="stat-label">Total Students</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="todaySearches">0</div>
-                        <div class="stat-label">Today's Searches</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="maleStudents">0</div>
@@ -1211,9 +1259,6 @@
                     </button>
                     <button class="btn btn-success" onclick="showTab('dataUpload')">
                         <i class="fas fa-upload"></i> Upload Data
-                    </button>
-                    <button class="btn btn-warning" onclick="showTab('reports')">
-                        <i class="fas fa-chart-bar"></i> Generate Reports
                     </button>
                 </div>
             </div>
@@ -1251,7 +1296,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Stream</label>
-                            <input type="text" id="adminStream" placeholder="e.g., Natural Science">
+                            <select id="adminStream">
+                                <option value="">Select Stream</option>
+                                <option value="Natural Science">Natural Science</option>
+                                <option value="Social Science">Social Science</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Registration Date</label>
@@ -1329,19 +1378,6 @@
                     <button class="btn btn-success" onclick="exportToCSV()">
                         <i class="fas fa-download"></i> Export to CSV
                     </button>
-                    <button class="btn btn-warning" onclick="backupData()">
-                        <i class="fas fa-database"></i> Backup Data
-                    </button>
-                </div>
-
-                <div class="admin-form">
-                    <h3>Data Management</h3>
-                    <button class="btn btn-danger" onclick="clearAllData()">
-                        <i class="fas fa-trash"></i> Clear All Data
-                    </button>
-                    <button class="btn btn-warning" onclick="loadSampleData()">
-                        <i class="fas fa-database"></i> Load Sample Data
-                    </button>
                 </div>
             </div>
 
@@ -1350,14 +1386,6 @@
                 <h2>Reports & Analytics</h2>
                 
                 <div class="report-options">
-                    <div class="report-card" onclick="generateReport('registration')">
-                        <h4><i class="fas fa-clipboard-list"></i> Registration Report</h4>
-                        <p>Detailed registration statistics</p>
-                    </div>
-                    <div class="report-card" onclick="generateReport('dormitory')">
-                        <h4><i class="fas fa-bed"></i> Dormitory Allocation</h4>
-                        <p>Dormitory assignment report</p>
-                    </div>
                     <div class="report-card" onclick="generateReport('gender')">
                         <h4><i class="fas fa-venus-mars"></i> Gender Distribution</h4>
                         <p>Male/Female student ratios</p>
@@ -1372,44 +1400,6 @@
                     <h3>Report Output</h3>
                     <div id="reportContent">
                         <p>Select a report type to generate output...</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Tools Tab -->
-            <div id="system" class="tab-content">
-                <h2>System Tools</h2>
-                
-                <div class="admin-form">
-                    <h3>System Information</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Total Records</label>
-                            <input type="text" id="systemTotalRecords" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Last Backup</label>
-                            <input type="text" id="systemLastBackup" readonly>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="admin-form">
-                    <h3>Maintenance</h3>
-                    <button class="btn btn-warning" onclick="optimizeData()">
-                        <i class="fas fa-wrench"></i> Optimize Data
-                    </button>
-                    <button class="btn btn-primary" onclick="refreshCache()">
-                        <i class="fas fa-sync"></i> Refresh Cache
-                    </button>
-                </div>
-
-                <div class="admin-form">
-                    <h3>Activity Log</h3>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
-                        <div id="activityLog">
-                            <!-- Activity log will appear here -->
-                        </div>
                     </div>
                 </div>
             </div>
@@ -1519,44 +1509,66 @@
     </footer>
 
     <script>
-        // ===== ADMIN SYSTEM FUNCTIONS =====
+        // ===== ADMIN AUTHENTICATION =====
+        const adminCredentials = {
+            username: "admin",
+            password: "admin123"
+        };
+
+        let currentAdmin = null;
         let studentData = [];
-        let activityLog = [];
+
+        function showAdminLogin() {
+            document.getElementById('adminLoginModal').style.display = 'block';
+        }
+
+        function hideAdminLogin() {
+            document.getElementById('adminLoginModal').style.display = 'none';
+            document.getElementById('adminLoginError').textContent = '';
+        }
+
+        function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorElement = document.getElementById('adminLoginError');
+
+            if (username === adminCredentials.username && password === adminCredentials.password) {
+                currentAdmin = username;
+                hideAdminLogin();
+                showAdminPanel();
+            } else {
+                errorElement.textContent = 'Invalid username or password!';
+            }
+        }
+
+        function adminLogout() {
+            currentAdmin = null;
+            hideAdminPanel();
+        }
 
         function showAdminPanel() {
             document.getElementById('adminPanel').style.display = 'block';
             loadStudentData();
             updateDashboard();
-            logActivity('Admin panel opened');
         }
 
         function hideAdminPanel() {
             document.getElementById('adminPanel').style.display = 'none';
-            logActivity('Admin panel closed');
         }
 
+        // ===== ADMIN SYSTEM FUNCTIONS =====
         function showTab(tabName) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
-            // Remove active class from all tabs
             document.querySelectorAll('.admin-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
-            // Show selected tab
             document.getElementById(tabName).classList.add('active');
-            
-            // Activate clicked tab
             event.target.classList.add('active');
-            
-            logActivity(`Switched to ${tabName} tab`);
         }
 
         function loadStudentData() {
-            // Load from localStorage or initialize with sample data
             const savedData = localStorage.getItem('studentData');
             if (savedData) {
                 studentData = JSON.parse(savedData);
@@ -1610,21 +1622,12 @@
 
         function saveStudentData() {
             localStorage.setItem('studentData', JSON.stringify(studentData));
-            logActivity('Student data saved');
         }
 
         function updateDashboard() {
             document.getElementById('totalStudents').textContent = studentData.length;
             document.getElementById('maleStudents').textContent = studentData.filter(s => s.gender === 'Male').length;
             document.getElementById('femaleStudents').textContent = studentData.filter(s => s.gender === 'Female').length;
-            
-            // Update today's searches
-            const todaySearches = localStorage.getItem('todaySearches') || '0';
-            document.getElementById('todaySearches').textContent = todaySearches;
-            
-            // Update system info
-            document.getElementById('systemTotalRecords').value = studentData.length;
-            document.getElementById('systemLastBackup').value = new Date().toLocaleString();
         }
 
         function updateStudentTable() {
@@ -1683,10 +1686,8 @@
             const existingIndex = studentData.findIndex(s => s.admissionNumber === admissionNo);
             if (existingIndex >= 0) {
                 studentData[existingIndex] = student;
-                logActivity(`Updated student: ${name}`);
             } else {
                 studentData.push(student);
-                logActivity(`Added new student: ${name}`);
             }
             
             saveStudentData();
@@ -1712,17 +1713,14 @@
             document.getElementById('adminBed').value = student.dormBed;
             
             showTab('studentManagement');
-            logActivity(`Editing student: ${student.name}`);
         }
 
         function deleteStudent(index) {
             if (confirm('Are you sure you want to delete this student?')) {
-                const student = studentData[index];
                 studentData.splice(index, 1);
                 saveStudentData();
                 updateStudentTable();
                 updateDashboard();
-                logActivity(`Deleted student: ${student.name}`);
                 alert('Student deleted successfully!');
             }
         }
@@ -1753,7 +1751,6 @@
             
             reader.onload = function(e) {
                 const csvText = e.target.result;
-                // Simple CSV parsing
                 const lines = csvText.split('\n');
                 let newStudents = [];
                 
@@ -1768,14 +1765,17 @@
                                 name: fields[2] || '',
                                 gender: fields[3] || '',
                                 stream: fields[4] || '',
-                                registrationDate: fields[5] || '',
+                                registrationDate: fields[5] || 'October 23-24, 2025',
                                 building: fields[6] || 'Science Building',
                                 roomORwindow: fields[7] || 'Window 1',
                                 dormBuilding: fields[8] || '',
                                 dormRoom: fields[9] || '',
                                 dormBed: fields[10] || ''
                             };
-                            newStudents.push(student);
+                            // Avoid duplicates
+                            if (!studentData.find(s => s.admissionNumber === student.admissionNumber)) {
+                                newStudents.push(student);
+                            }
                         }
                     }
                 }
@@ -1784,7 +1784,6 @@
                 saveStudentData();
                 updateStudentTable();
                 updateDashboard();
-                logActivity(`Uploaded CSV file: ${file.name} (${newStudents.length} students)`);
                 alert(`Successfully uploaded ${newStudents.length} students from CSV file!`);
             };
             
@@ -1819,188 +1818,37 @@
             a.download = `student_data_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
-            
-            logActivity('Exported student data to CSV');
-        }
-
-        function backupData() {
-            const backup = {
-                studentData: studentData,
-                timestamp: new Date().toISOString(),
-                recordCount: studentData.length
-            };
-            
-            localStorage.setItem('dataBackup', JSON.stringify(backup));
-            logActivity('Data backup created');
-            alert('Data backup created successfully!');
-        }
-
-        function clearAllData() {
-            if (confirm('Are you sure you want to clear ALL student data? This cannot be undone!')) {
-                studentData = [];
-                saveStudentData();
-                updateStudentTable();
-                updateDashboard();
-                logActivity('All student data cleared');
-                alert('All student data has been cleared!');
-            }
-        }
-
-        function loadSampleData() {
-            if (confirm('Load sample student data? This will add sample records.')) {
-                const sampleData = [
-                    {
-                        admissionNumber: "SAMPLE001",
-                        studentId: "SAMPLE001",
-                        name: "Sample Student One",
-                        gender: "Male",
-                        registrationDate: "October 25-26, 2025",
-                        building: "Main Building",
-                        roomORwindow: "Window 4",
-                        stream: "Natural Science",
-                        dormBuilding: "Sample Dorm A",
-                        dormRoom: "Room 101",
-                        dormBed: "Bed 1"
-                    },
-                    {
-                        admissionNumber: "SAMPLE002",
-                        studentId: "SAMPLE002",
-                        name: "Sample Student Two",
-                        gender: "Female",
-                        registrationDate: "October 25-26, 2025",
-                        building: "Main Building",
-                        roomORwindow: "Window 5",
-                        stream: "Social Science",
-                        dormBuilding: "Sample Dorm B",
-                        dormRoom: "Room 202",
-                        dormBed: "Bed 2"
-                    }
-                ];
-                
-                studentData = studentData.concat(sampleData);
-                saveStudentData();
-                updateStudentTable();
-                updateDashboard();
-                logActivity('Sample data loaded');
-                alert('Sample data loaded successfully!');
-            }
         }
 
         function generateReport(type) {
             let reportHTML = '';
             
-            switch(type) {
-                case 'registration':
-                    const buildings = {};
-                    studentData.forEach(student => {
-                        buildings[student.building] = (buildings[student.building] || 0) + 1;
-                    });
-                    
-                    reportHTML = '<h4>Registration Building Distribution</h4>';
-                    for (const [building, count] of Object.entries(buildings)) {
-                        reportHTML += `<p>${building}: ${count} students</p>`;
-                    }
-                    break;
-                    
-                case 'dormitory':
-                    const dorms = {};
-                    studentData.forEach(student => {
-                        if (student.dormBuilding && student.dormBuilding !== 'Not assigned') {
-                            dorms[student.dormBuilding] = (dorms[student.dormBuilding] || 0) + 1;
-                        }
-                    });
-                    
-                    reportHTML = '<h4>Dormitory Allocation</h4>';
-                    for (const [dorm, count] of Object.entries(dorms)) {
-                        reportHTML += `<p>${dorm}: ${count} students</p>`;
-                    }
-                    reportHTML += `<p><strong>Total with dormitory: ${Object.values(dorms).reduce((a, b) => a + b, 0)}</strong></p>`;
-                    break;
-                    
-                case 'gender':
-                    const maleCount = studentData.filter(s => s.gender === 'Male').length;
-                    const femaleCount = studentData.filter(s => s.gender === 'Female').length;
-                    const total = studentData.length;
-                    
-                    reportHTML = `
-                        <h4>Gender Distribution</h4>
-                        <p>Male Students: ${maleCount} (${((maleCount/total)*100).toFixed(1)}%)</p>
-                        <p>Female Students: ${femaleCount} (${((femaleCount/total)*100).toFixed(1)}%)</p>
-                        <p>Total Students: ${total}</p>
-                    `;
-                    break;
-                    
-                case 'stream':
-                    const streams = {};
-                    studentData.forEach(student => {
-                        streams[student.stream] = (streams[student.stream] || 0) + 1;
-                    });
-                    
-                    reportHTML = '<h4>Stream Distribution</h4>';
-                    for (const [stream, count] of Object.entries(streams)) {
-                        reportHTML += `<p>${stream}: ${count} students</p>`;
-                    }
-                    break;
+            if (type === 'gender') {
+                const maleCount = studentData.filter(s => s.gender === 'Male').length;
+                const femaleCount = studentData.filter(s => s.gender === 'Female').length;
+                const total = studentData.length;
+                
+                reportHTML = `
+                    <h4>Gender Distribution</h4>
+                    <p>Male Students: ${maleCount} (${((maleCount/total)*100).toFixed(1)}%)</p>
+                    <p>Female Students: ${femaleCount} (${((femaleCount/total)*100).toFixed(1)}%)</p>
+                    <p>Total Students: ${total}</p>
+                `;
+            } else if (type === 'stream') {
+                const naturalScience = studentData.filter(s => s.stream === 'Natural Science').length;
+                const socialScience = studentData.filter(s => s.stream === 'Social Science').length;
+                const total = studentData.length;
+                
+                reportHTML = `
+                    <h4>Stream Distribution</h4>
+                    <p>Natural Science: ${naturalScience} (${((naturalScience/total)*100).toFixed(1)}%)</p>
+                    <p>Social Science: ${socialScience} (${((socialScience/total)*100).toFixed(1)}%)</p>
+                    <p>Total Students: ${total}</p>
+                `;
             }
             
             document.getElementById('reportContent').innerHTML = reportHTML;
-            logActivity(`Generated ${type} report`);
         }
-
-        function optimizeData() {
-            // Remove duplicates
-            const uniqueData = [];
-            const seen = new Set();
-            
-            studentData.forEach(student => {
-                if (!seen.has(student.admissionNumber)) {
-                    seen.add(student.admissionNumber);
-                    uniqueData.push(student);
-                }
-            });
-            
-            studentData = uniqueData;
-            saveStudentData();
-            updateStudentTable();
-            updateDashboard();
-            logActivity('Data optimized (duplicates removed)');
-            alert(`Data optimized! Removed ${studentData.length - uniqueData.length} duplicates.`);
-        }
-
-        function refreshCache() {
-            localStorage.removeItem('studentDataCache');
-            loadStudentData();
-            logActivity('Cache refreshed');
-            alert('Cache refreshed successfully!');
-        }
-
-        function logActivity(message) {
-            const timestamp = new Date().toLocaleString();
-            activityLog.unshift(`${timestamp}: ${message}`);
-            
-            // Keep only last 50 activities
-            if (activityLog.length > 50) {
-                activityLog = activityLog.slice(0, 50);
-            }
-            
-            // Update activity log display
-            const logElement = document.getElementById('activityLog');
-            logElement.innerHTML = activityLog.map(activity => 
-                `<div style="padding: 5px 0; border-bottom: 1px solid #eee;">${activity}</div>`
-            ).join('');
-            
-            // Save to localStorage
-            localStorage.setItem('activityLog', JSON.stringify(activityLog));
-        }
-
-        // Load activity log on startup
-        window.addEventListener('load', function() {
-            const savedLog = localStorage.getItem('activityLog');
-            if (savedLog) {
-                activityLog = JSON.parse(savedLog);
-            }
-            logActivity('System initialized');
-        });
 
         // ===== YOUR EXISTING JAVASCRIPT FUNCTIONS =====
         // Set current year for copyright
@@ -2055,11 +1903,10 @@
             searchButton.textContent = 'Searching...';
             
             try {
-                // First check local student data
+                // Search in local student data first
                 const localStudent = studentData.find(s => s.admissionNumber.toUpperCase() === input);
                 
                 if (localStudent) {
-                    // Use local data
                     displayStudentResult(localStudent);
                 } else {
                     // Fallback to CSV file
@@ -2127,14 +1974,6 @@
                 loadingIndicator.style.display = 'none';
                 searchButton.disabled = false;
                 searchButton.textContent = 'Search';
-                
-                // Track search activity
-                const today = new Date().toDateString();
-                const searchCount = parseInt(localStorage.getItem('todaySearches') || '0') + 1;
-                localStorage.setItem('todaySearches', searchCount.toString());
-                updateDashboard();
-                
-                logActivity(`Student search: ${input}`);
             }
         }
 
@@ -2218,6 +2057,14 @@
             document.getElementById('usernameInput').focus();
             // Initialize admin system
             loadStudentData();
+        });
+
+        // Close admin login modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('adminLoginModal');
+            if (event.target === modal) {
+                hideAdminLogin();
+            }
         });
     </script>
 </body>
