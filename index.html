@@ -1379,6 +1379,17 @@
                         <i class="fas fa-download"></i> Export to CSV
                     </button>
                 </div>
+
+                <div class="admin-form">
+                    <h3>Data Management</h3>
+                    <p>Clear all uploaded student data</p>
+                    <button class="btn btn-danger" onclick="clearAllData()">
+                        <i class="fas fa-trash"></i> Clear All Data
+                    </button>
+                    <p style="color: #dc3545; font-size: 12px; margin-top: 10px;">
+                        <i class="fas fa-exclamation-triangle"></i> Warning: This will permanently delete all student records!
+                    </p>
+                </div>
             </div>
 
             <!-- Reports Tab -->
@@ -1753,6 +1764,7 @@
                 const csvText = e.target.result;
                 const lines = csvText.split('\n');
                 let newStudents = [];
+                let skipped = 0;
                 
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
@@ -1760,31 +1772,45 @@
                         const fields = line.split(',');
                         if (fields.length >= 3) {
                             const student = {
-                                admissionNumber: fields[0] || '',
-                                studentId: fields[1] || '',
-                                name: fields[2] || '',
-                                gender: fields[3] || '',
-                                stream: fields[4] || '',
-                                registrationDate: fields[5] || 'October 23-24, 2025',
-                                building: fields[6] || 'Science Building',
-                                roomORwindow: fields[7] || 'Window 1',
-                                dormBuilding: fields[8] || '',
-                                dormRoom: fields[9] || '',
-                                dormBed: fields[10] || ''
+                                admissionNumber: fields[0] ? fields[0].trim() : '',
+                                studentId: fields[1] ? fields[1].trim() : '',
+                                name: fields[2] ? fields[2].trim() : '',
+                                gender: fields[3] ? fields[3].trim() : '',
+                                stream: fields[4] ? fields[4].trim() : '',
+                                registrationDate: fields[5] ? fields[5].trim() : 'October 23-24, 2025',
+                                building: fields[6] ? fields[6].trim() : 'Science Building',
+                                roomORwindow: fields[7] ? fields[7].trim() : 'Window 1',
+                                dormBuilding: fields[8] ? fields[8].trim() : '',
+                                dormRoom: fields[9] ? fields[9].trim() : '',
+                                dormBed: fields[10] ? fields[10].trim() : ''
                             };
-                            // Avoid duplicates
-                            if (!studentData.find(s => s.admissionNumber === student.admissionNumber)) {
+                            
+                            // Check if student already exists
+                            const existingIndex = studentData.findIndex(s => s.admissionNumber === student.admissionNumber);
+                            if (existingIndex >= 0) {
+                                // Update existing student
+                                studentData[existingIndex] = student;
+                                skipped++;
+                            } else {
+                                // Add new student
                                 newStudents.push(student);
                             }
                         }
                     }
                 }
                 
+                // Add new students to the array
                 studentData = studentData.concat(newStudents);
                 saveStudentData();
                 updateStudentTable();
                 updateDashboard();
-                alert(`Successfully uploaded ${newStudents.length} students from CSV file!`);
+                
+                let message = `Successfully processed CSV file!\n`;
+                message += `- Added ${newStudents.length} new students\n`;
+                if (skipped > 0) {
+                    message += `- Updated ${skipped} existing students`;
+                }
+                alert(message);
             };
             
             reader.readAsText(file);
@@ -1818,6 +1844,18 @@
             a.download = `student_data_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
+            
+            alert('Student data exported successfully!');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ WARNING: This will permanently delete ALL student data!\n\nThis action cannot be undone. Are you sure you want to continue?')) {
+                studentData = [];
+                saveStudentData();
+                updateStudentTable();
+                updateDashboard();
+                alert('All student data has been cleared!');
+            }
         }
 
         function generateReport(type) {
@@ -1903,7 +1941,7 @@
             searchButton.textContent = 'Searching...';
             
             try {
-                // Search in local student data first
+                // Search in local student data first (admin uploaded data)
                 const localStudent = studentData.find(s => s.admissionNumber.toUpperCase() === input);
                 
                 if (localStudent) {
