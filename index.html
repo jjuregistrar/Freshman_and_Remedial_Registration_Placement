@@ -1261,6 +1261,15 @@
                         <i class="fas fa-upload"></i> Upload Data
                     </button>
                 </div>
+
+                <!-- Debug Tools -->
+                <div class="admin-form">
+                    <h3>Debug Tools</h3>
+                    <button class="btn btn-warning" onclick="debugStudentData()">
+                        <i class="fas fa-bug"></i> Debug Student Data
+                    </button>
+                    <p style="font-size: 12px; color: #666;">Check what data is actually stored</p>
+                </div>
             </div>
 
             <!-- Student Management Tab -->
@@ -1694,7 +1703,11 @@
             };
             
             // Check if updating existing student
-            const existingIndex = studentData.findIndex(s => s.admissionNumber === admissionNo);
+            const existingIndex = studentData.findIndex(s => 
+                s.admissionNumber.replace(/\s+/g, '').toUpperCase() === 
+                admissionNo.replace(/\s+/g, '').toUpperCase()
+            );
+            
             if (existingIndex >= 0) {
                 studentData[existingIndex] = student;
             } else {
@@ -1764,19 +1777,40 @@
                 const csvText = e.target.result;
                 const lines = csvText.split('\n');
                 let newStudents = [];
-                let skipped = 0;
+                let updated = 0;
+                let added = 0;
+                let errors = 0;
                 
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (line) {
-                        const fields = line.split(',');
+                        let fields;
+                        
+                        // Try different delimiters
+                        if (line.includes('\t')) {
+                            fields = line.split('\t');
+                        } else if (line.includes(',')) {
+                            fields = line.split(',');
+                        } else if (line.includes(';')) {
+                            fields = line.split(';');
+                        } else {
+                            fields = line.split(/\s+/);
+                        }
+                        
                         if (fields.length >= 3) {
+                            const admissionNumber = fields[0] ? fields[0].trim() : '';
+                            
+                            if (!admissionNumber) {
+                                errors++;
+                                continue;
+                            }
+                            
                             const student = {
-                                admissionNumber: fields[0] ? fields[0].trim() : '',
-                                studentId: fields[1] ? fields[1].trim() : '',
-                                name: fields[2] ? fields[2].trim() : '',
-                                gender: fields[3] ? fields[3].trim() : '',
-                                stream: fields[4] ? fields[4].trim() : '',
+                                admissionNumber: admissionNumber,
+                                studentId: fields[1] ? fields[1].trim() : admissionNumber,
+                                name: fields[2] ? fields[2].trim() : 'Unknown',
+                                gender: fields[3] ? fields[3].trim() : 'Not specified',
+                                stream: fields[4] ? fields[4].trim() : 'Not specified',
                                 registrationDate: fields[5] ? fields[5].trim() : 'October 23-24, 2025',
                                 building: fields[6] ? fields[6].trim() : 'Science Building',
                                 roomORwindow: fields[7] ? fields[7].trim() : 'Window 1',
@@ -1786,15 +1820,22 @@
                             };
                             
                             // Check if student already exists
-                            const existingIndex = studentData.findIndex(s => s.admissionNumber === student.admissionNumber);
+                            const existingIndex = studentData.findIndex(s => 
+                                s.admissionNumber.replace(/\s+/g, '').toUpperCase() === 
+                                student.admissionNumber.replace(/\s+/g, '').toUpperCase()
+                            );
+                            
                             if (existingIndex >= 0) {
                                 // Update existing student
                                 studentData[existingIndex] = student;
-                                skipped++;
+                                updated++;
                             } else {
                                 // Add new student
                                 newStudents.push(student);
+                                added++;
                             }
+                        } else {
+                            errors++;
                         }
                     }
                 }
@@ -1805,12 +1846,22 @@
                 updateStudentTable();
                 updateDashboard();
                 
-                let message = `Successfully processed CSV file!\n`;
-                message += `- Added ${newStudents.length} new students\n`;
-                if (skipped > 0) {
-                    message += `- Updated ${skipped} existing students`;
+                let message = `CSV Processing Complete!\n\n`;
+                message += `✓ Added: ${added} new students\n`;
+                message += `✓ Updated: ${updated} existing students\n`;
+                if (errors > 0) {
+                    message += `✗ Errors: ${errors} lines skipped\n`;
                 }
+                message += `\nTotal students in system: ${studentData.length}`;
+                
                 alert(message);
+                
+                // Clear the file input
+                fileInput.value = '';
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading the CSV file. Please try again.');
             };
             
             reader.readAsText(file);
@@ -1888,39 +1939,29 @@
             document.getElementById('reportContent').innerHTML = reportHTML;
         }
 
-        // ===== YOUR EXISTING JAVASCRIPT FUNCTIONS =====
-        // Set current year for copyright
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navMenu = document.getElementById('navMenu');
-        
-        mobileMenuBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            navMenu.classList.toggle('active');
-        });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('nav') && !event.target.closest('.mobile-menu-btn')) {
-                navMenu.classList.remove('active');
-            }
-        });
-
-        // Navigation functions
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            navMenu.classList.remove('active');
+        // Debug function to check stored data
+        function debugStudentData() {
+            console.log('=== DEBUG: Student Data ===');
+            console.log('Total students:', studentData.length);
+            studentData.forEach((student, index) => {
+                console.log(`Student ${index + 1}:`, student);
+            });
+            console.log('=== END DEBUG ===');
+            
+            // Also show in alert for easy viewing
+            let debugInfo = `Total Students: ${studentData.length}\n\n`;
+            studentData.forEach((student, index) => {
+                debugInfo += `Student ${index + 1}:\n`;
+                debugInfo += `  Admission: ${student.admissionNumber}\n`;
+                debugInfo += `  Name: ${student.name}\n`;
+                debugInfo += `  Gender: ${student.gender}\n\n`;
+            });
+            alert(debugInfo);
         }
 
-        function scrollToAbout() {
-            document.getElementById('siteFooter').scrollIntoView({ behavior: 'smooth' });
-            navMenu.classList.remove('active');
-        }
-
+        // ===== IMPROVED SEARCH FUNCTION =====
         async function searchStudent() {
-            const input = document.getElementById('usernameInput').value.trim().toUpperCase();
+            const input = document.getElementById('usernameInput').value.trim();
             const resultDiv = document.getElementById('result');
             const dormitoryInfo = document.getElementById('dormitory-info');
             const loadingIndicator = document.getElementById('loadingIndicator');
@@ -1941,72 +1982,94 @@
             searchButton.textContent = 'Searching...';
             
             try {
+                // Force reload data from storage to ensure we have latest
+                loadStudentData();
+                
+                // Normalize the search input (remove spaces, convert to uppercase)
+                const searchInput = input.replace(/\s+/g, '').toUpperCase();
+                console.log('Searching for:', searchInput);
+                console.log('Available students:', studentData);
+                
                 // Search in local student data first (admin uploaded data)
-                const localStudent = studentData.find(s => s.admissionNumber.toUpperCase() === input);
+                const localStudent = studentData.find(s => {
+                    const studentAdmission = s.admissionNumber.replace(/\s+/g, '').toUpperCase();
+                    return studentAdmission === searchInput;
+                });
                 
                 if (localStudent) {
+                    console.log('Found in local data:', localStudent);
                     displayStudentResult(localStudent);
                 } else {
+                    console.log('Not found in local data, checking CSV...');
                     // Fallback to CSV file
-                    const response = await fetch('data.csv');
-                    
-                    if (!response.ok) {
-                        throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
-                    }
-                    
-                    const csvText = await response.text();
-                    const lines = csvText.trim().split('\n');
-                    let studentFound = null;
-                    
-                    for (let i = 1; i < lines.length; i++) {
-                        const line = lines[i].trim();
-                        if (line) {
-                            let fields;
-                            if (line.includes('\t')) {
-                                fields = line.split('\t');
-                            } else if (line.includes(',')) {
-                                fields = line.split(',');
-                            } else {
-                                fields = line.split(/\s+/);
-                            }
-                            
-                            if (fields.length >= 2 && fields[0].trim().toUpperCase() === input) {
-                                studentFound = {
-                                    admissionNumber: fields[0] ? fields[0].trim() : 'Unknown',
-                                    studentId: fields[1] ? fields[1].trim() : 'Unknown',
-                                    name: fields[2] ? fields[2].trim() : 'Not specified',
-                                    gender: fields[3] ? fields[3].trim() : 'Not specified',
-                                    building: fields[4] ? fields[4].trim() : 'Not specified',
-                                    roomORwindow: fields[5] ? fields[5].trim() : 'Not specified',
-                                    registrationDate: fields[6] ? fields[6].trim() : 'Not specified',
-                                    stream: fields[7] ? fields[7].trim() : 'Not specified',
-                                    dormBuilding: fields[8] ? fields[8].trim() : 'Not assigned',
-                                    dormRoom: fields[9] ? fields[9].trim() : 'Not assigned',
-                                    dormBed: fields[10] ? fields[10].trim() : 'Not assigned'
-                                };
-                                break;
+                    try {
+                        const response = await fetch('data.csv');
+                        
+                        if (!response.ok) {
+                            throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
+                        }
+                        
+                        const csvText = await response.text();
+                        const lines = csvText.trim().split('\n');
+                        let studentFound = null;
+                        
+                        for (let i = 1; i < lines.length; i++) {
+                            const line = lines[i].trim();
+                            if (line) {
+                                let fields;
+                                if (line.includes('\t')) {
+                                    fields = line.split('\t');
+                                } else if (line.includes(',')) {
+                                    fields = line.split(',');
+                                } else {
+                                    fields = line.split(/\s+/);
+                                }
+                                
+                                if (fields.length >= 2) {
+                                    const csvAdmission = fields[0].trim().replace(/\s+/g, '').toUpperCase();
+                                    if (csvAdmission === searchInput) {
+                                        studentFound = {
+                                            admissionNumber: fields[0] ? fields[0].trim() : 'Unknown',
+                                            studentId: fields[1] ? fields[1].trim() : 'Unknown',
+                                            name: fields[2] ? fields[2].trim() : 'Not specified',
+                                            gender: fields[3] ? fields[3].trim() : 'Not specified',
+                                            building: fields[4] ? fields[4].trim() : 'Not specified',
+                                            roomORwindow: fields[5] ? fields[5].trim() : 'Not specified',
+                                            registrationDate: fields[6] ? fields[6].trim() : 'Not specified',
+                                            stream: fields[7] ? fields[7].trim() : 'Not specified',
+                                            dormBuilding: fields[8] ? fields[8].trim() : 'Not assigned',
+                                            dormRoom: fields[9] ? fields[9].trim() : 'Not assigned',
+                                            dormBed: fields[10] ? fields[10].trim() : 'Not assigned'
+                                        };
+                                        break;
+                                    }
+                                }
                             }
                         }
-                    }
-                    
-                    if (studentFound) {
-                        displayStudentResult(studentFound);
-                    } else {
-                        resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
+                        
+                        if (studentFound) {
+                            console.log('Found in CSV:', studentFound);
+                            displayStudentResult(studentFound);
+                        } else {
+                            console.log('Not found in CSV either');
+                            resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
+                        }
+                    } catch (csvError) {
+                        console.log('CSV error:', csvError);
+                        // If CSV fails, try sample data
+                        const sampleStudent = getSampleStudent(searchInput);
+                        if (sampleStudent) {
+                            console.log('Found in sample data:', sampleStudent);
+                            displayStudentResult(sampleStudent);
+                        } else {
+                            resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
+                        }
                     }
                 }
                 
             } catch (error) {
                 console.error('Error searching for student:', error);
                 resultDiv.innerHTML = `<p class="red">Error searching for student: ${error.message}</p>`;
-                
-                // Final fallback to hardcoded sample data
-                const sampleStudent = getSampleStudent(input);
-                if (sampleStudent) {
-                    displayStudentResult(sampleStudent);
-                } else {
-                    resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
-                }
             } finally {
                 // Hide loading indicator and re-enable button
                 loadingIndicator.style.display = 'none';
@@ -2081,6 +2144,37 @@
             };
             
             return sampleData[admissionNumber] || null;
+        }
+
+        // ===== YOUR EXISTING JAVASCRIPT FUNCTIONS =====
+        // Set current year for copyright
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+        
+        mobileMenuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('nav') && !event.target.closest('.mobile-menu-btn')) {
+                navMenu.classList.remove('active');
+            }
+        });
+
+        // Navigation functions
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            navMenu.classList.remove('active');
+        }
+
+        function scrollToAbout() {
+            document.getElementById('siteFooter').scrollIntoView({ behavior: 'smooth' });
+            navMenu.classList.remove('active');
         }
 
         // Allow searching by pressing Enter key
