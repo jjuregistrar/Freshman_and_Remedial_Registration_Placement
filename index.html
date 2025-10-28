@@ -1172,6 +1172,22 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
+        /* Date input styling */
+        .date-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-input-group input[type="date"] {
+            flex: 1;
+        }
+
+        .date-input-group .btn {
+            width: auto;
+            padding: 10px 15px;
+        }
+
         @media (max-width: 768px) {
             .admin-content {
                 margin: 10px auto;
@@ -1281,17 +1297,17 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Admission Number *</label>
-                            <input type="text" id="adminAdmissionNo" placeholder="e.g., NGAT00000018">
+                            <input type="text" id="adminAdmissionNo" placeholder="e.g., 7898156">
                         </div>
                         <div class="form-group">
                             <label>Student ID</label>
-                            <input type="text" id="adminStudentId" placeholder="Student ID">
+                            <input type="text" id="adminStudentId" placeholder="e.g., JJUUGRE181556">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Full Name *</label>
-                            <input type="text" id="adminStudentName" placeholder="Full name">
+                            <input type="text" id="adminStudentName" placeholder="e.g., Bie Chuol Koryom">
                         </div>
                         <div class="form-group">
                             <label>Gender</label>
@@ -1313,31 +1329,35 @@
                         </div>
                         <div class="form-group">
                             <label>Registration Date</label>
-                            <input type="text" id="adminRegDate" placeholder="e.g., October 23-24, 2025">
+                            <div class="date-input-group">
+                                <input type="date" id="adminRegDateCalendar">
+                                <span style="margin: 0 10px;">OR</span>
+                                <input type="text" id="adminRegDate" placeholder="e.g., October 23-24, 2025">
+                            </div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Registration Building</label>
-                            <input type="text" id="adminBuilding" placeholder="e.g., Science Building">
+                            <input type="text" id="adminBuilding" placeholder="e.g., Main Registrar">
                         </div>
                         <div class="form-group">
                             <label>Registration Window</label>
-                            <input type="text" id="adminWindow" placeholder="e.g., Window 1">
+                            <input type="text" id="adminWindow" placeholder="e.g., Window 4">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Dormitory Building</label>
-                            <input type="text" id="adminDormBuilding" placeholder="e.g., Male Dormitory A">
+                            <input type="text" id="adminDormBuilding" placeholder="e.g., Block-25">
                         </div>
                         <div class="form-group">
                             <label>Room Number</label>
-                            <input type="text" id="adminRoom" placeholder="e.g., Room 205">
+                            <input type="text" id="adminRoom" placeholder="e.g., 3">
                         </div>
                         <div class="form-group">
                             <label>Bed Number</label>
-                            <input type="text" id="adminBed" placeholder="e.g., Bed 3">
+                            <input type="text" id="adminBed" placeholder="e.g., 1">
                         </div>
                     </div>
                     <button class="btn btn-success" onclick="addOrUpdateStudent()">
@@ -1354,9 +1374,16 @@
                         <thead>
                             <tr>
                                 <th>Admission No</th>
+                                <th>Student ID</th>
                                 <th>Name</th>
                                 <th>Gender</th>
                                 <th>Stream</th>
+                                <th>Registration Date</th>
+                                <th>Building</th>
+                                <th>Window</th>
+                                <th>Dorm Building</th>
+                                <th>Room</th>
+                                <th>Bed</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -1596,43 +1623,30 @@
                 // Initialize with sample data
                 studentData = [
                     {
-                        admissionNumber: "NGAT00000018",
-                        studentId: "NGAT00000018",
-                        name: "Ahmed Mohammed",
+                        admissionNumber: "7898156",
+                        studentId: "JJUUGRE181556",
+                        name: "Bie Chuol Koryom",
                         gender: "Male",
-                        registrationDate: "October 23-24, 2025",
-                        building: "Science Building",
-                        roomORwindow: "Window 1",
                         stream: "Natural Science",
-                        dormBuilding: "Male Dormitory A",
-                        dormRoom: "Room 205",
-                        dormBed: "Bed 3"
+                        registrationDate: "October 23-24, 2025",
+                        building: "Main Registrar",
+                        roomORwindow: "Window 4",
+                        dormBuilding: "Block-25",
+                        dormRoom: "3",
+                        dormBed: "1"
                     },
                     {
-                        admissionNumber: "NGAT00000019",
-                        studentId: "NGAT00000019",
-                        name: "Sadam Dawud",
+                        admissionNumber: "7425675",
+                        studentId: "JJUUGRE181557",
+                        name: "Buay Tung Tuit Tuit",
                         gender: "Male",
-                        registrationDate: "October 23-24, 2025",
-                        building: "Science Building",
-                        roomORwindow: "Window 2",
-                        stream: "Social Science",
-                        dormBuilding: "Male Dormitory B",
-                        dormRoom: "Room 312",
-                        dormBed: "Bed 1"
-                    },
-                    {
-                        admissionNumber: "NGAT00000020",
-                        studentId: "NGAT00000020",
-                        name: "Soreti Siraj",
-                        gender: "Female",
-                        registrationDate: "October 23-24, 2025",
-                        building: "Science Building",
-                        roomORwindow: "Window 3",
                         stream: "Natural Science",
-                        dormBuilding: "Female Dormitory C",
-                        dormRoom: "Room 108",
-                        dormBed: "Bed 2"
+                        registrationDate: "October 23-24, 2025",
+                        building: "Main Registrar",
+                        roomORwindow: "Window 5",
+                        dormBuilding: "Block-25",
+                        dormRoom: "3",
+                        dormBed: "2"
                     }
                 ];
                 saveStudentData();
@@ -1658,9 +1672,16 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${student.admissionNumber}</td>
+                    <td>${student.studentId}</td>
                     <td>${student.name}</td>
                     <td>${student.gender}</td>
                     <td>${student.stream}</td>
+                    <td>${student.registrationDate}</td>
+                    <td>${student.building}</td>
+                    <td>${student.roomORwindow}</td>
+                    <td>${student.dormBuilding}</td>
+                    <td>${student.dormRoom}</td>
+                    <td>${student.dormBed}</td>
                     <td>
                         <button class="btn btn-primary" onclick="editStudent(${index})">Edit</button>
                         <button class="btn btn-danger" onclick="deleteStudent(${index})">Delete</button>
@@ -1676,7 +1697,12 @@
             const name = document.getElementById('adminStudentName').value;
             const gender = document.getElementById('adminGender').value;
             const stream = document.getElementById('adminStream').value;
-            const regDate = document.getElementById('adminRegDate').value;
+            
+            // Get registration date from either calendar or text input
+            const calendarDate = document.getElementById('adminRegDateCalendar').value;
+            const textDate = document.getElementById('adminRegDate').value;
+            const regDate = calendarDate ? formatDate(calendarDate) : textDate;
+            
             const building = document.getElementById('adminBuilding').value;
             const window = document.getElementById('adminWindow').value;
             const dormBuilding = document.getElementById('adminDormBuilding').value;
@@ -1694,7 +1720,7 @@
                 name: name,
                 gender: gender,
                 stream: stream,
-                registrationDate: regDate,
+                registrationDate: regDate || 'October 23-24, 2025',
                 building: building,
                 roomORwindow: window,
                 dormBuilding: dormBuilding,
@@ -1720,6 +1746,12 @@
             clearStudentForm();
             
             alert('Student saved successfully!');
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
         }
 
         function editStudent(index) {
@@ -1756,6 +1788,7 @@
             document.getElementById('adminGender').value = '';
             document.getElementById('adminStream').value = '';
             document.getElementById('adminRegDate').value = '';
+            document.getElementById('adminRegDateCalendar').value = '';
             document.getElementById('adminBuilding').value = '';
             document.getElementById('adminWindow').value = '';
             document.getElementById('adminDormBuilding').value = '';
@@ -1786,7 +1819,7 @@
                     if (line) {
                         let fields;
                         
-                        // Try different delimiters
+                        // Try tab delimiter first (since your data uses tabs)
                         if (line.includes('\t')) {
                             fields = line.split('\t');
                         } else if (line.includes(',')) {
@@ -1797,7 +1830,7 @@
                             fields = line.split(/\s+/);
                         }
                         
-                        if (fields.length >= 3) {
+                        if (fields.length >= 11) {
                             const admissionNumber = fields[0] ? fields[0].trim() : '';
                             
                             if (!admissionNumber) {
@@ -1812,7 +1845,7 @@
                                 gender: fields[3] ? fields[3].trim() : 'Not specified',
                                 stream: fields[4] ? fields[4].trim() : 'Not specified',
                                 registrationDate: fields[5] ? fields[5].trim() : 'October 23-24, 2025',
-                                building: fields[6] ? fields[6].trim() : 'Science Building',
+                                building: fields[6] ? fields[6].trim() : 'Main Registrar',
                                 roomORwindow: fields[7] ? fields[7].trim() : 'Window 1',
                                 dormBuilding: fields[8] ? fields[8].trim() : '',
                                 dormRoom: fields[9] ? fields[9].trim() : '',
@@ -1868,7 +1901,7 @@
         }
 
         function exportToCSV() {
-            let csvContent = "AdmissionNumber,StudentID,Name,Gender,Stream,RegistrationDate,Building,Window,DormBuilding,Room,Bed\n";
+            let csvContent = "AdmissionNumber\tStudentID\tName\tGender\tStream\tRegistrationDate\tBuilding\tWindow\tDormBuilding\tRoom\tBed\n";
             
             studentData.forEach(student => {
                 const row = [
@@ -1883,7 +1916,7 @@
                     student.dormBuilding,
                     student.dormRoom,
                     student.dormBed
-                ].join(',');
+                ].join('\t');
                 
                 csvContent += row + '\n';
             });
@@ -1954,7 +1987,10 @@
                 debugInfo += `Student ${index + 1}:\n`;
                 debugInfo += `  Admission: ${student.admissionNumber}\n`;
                 debugInfo += `  Name: ${student.name}\n`;
-                debugInfo += `  Gender: ${student.gender}\n\n`;
+                debugInfo += `  Gender: ${student.gender}\n`;
+                debugInfo += `  Stream: ${student.stream}\n`;
+                debugInfo += `  Building: ${student.building}\n`;
+                debugInfo += `  Window: ${student.roomORwindow}\n\n`;
             });
             alert(debugInfo);
         }
@@ -1969,7 +2005,9 @@
             
             // Clear previous results and hide dormitory info
             resultDiv.innerHTML = '';
-            dormitoryInfo.style.display = 'none';
+            if (dormitoryInfo) {
+                dormitoryInfo.style.display = 'none';
+            }
             
             if (!input) {
                 resultDiv.innerHTML = `<p class="red">Please enter admission number to search.</p>`;
@@ -1987,8 +2025,6 @@
                 
                 // Normalize the search input (remove spaces, convert to uppercase)
                 const searchInput = input.replace(/\s+/g, '').toUpperCase();
-                console.log('Searching for:', searchInput);
-                console.log('Available students:', studentData);
                 
                 // Search in local student data first (admin uploaded data)
                 const localStudent = studentData.find(s => {
@@ -1997,74 +2033,9 @@
                 });
                 
                 if (localStudent) {
-                    console.log('Found in local data:', localStudent);
                     displayStudentResult(localStudent);
                 } else {
-                    console.log('Not found in local data, checking CSV...');
-                    // Fallback to CSV file
-                    try {
-                        const response = await fetch('data.csv');
-                        
-                        if (!response.ok) {
-                            throw new Error(`Failed to load data: ${response.status} ${response.statusText}`);
-                        }
-                        
-                        const csvText = await response.text();
-                        const lines = csvText.trim().split('\n');
-                        let studentFound = null;
-                        
-                        for (let i = 1; i < lines.length; i++) {
-                            const line = lines[i].trim();
-                            if (line) {
-                                let fields;
-                                if (line.includes('\t')) {
-                                    fields = line.split('\t');
-                                } else if (line.includes(',')) {
-                                    fields = line.split(',');
-                                } else {
-                                    fields = line.split(/\s+/);
-                                }
-                                
-                                if (fields.length >= 2) {
-                                    const csvAdmission = fields[0].trim().replace(/\s+/g, '').toUpperCase();
-                                    if (csvAdmission === searchInput) {
-                                        studentFound = {
-                                            admissionNumber: fields[0] ? fields[0].trim() : 'Unknown',
-                                            studentId: fields[1] ? fields[1].trim() : 'Unknown',
-                                            name: fields[2] ? fields[2].trim() : 'Not specified',
-                                            gender: fields[3] ? fields[3].trim() : 'Not specified',
-                                            building: fields[4] ? fields[4].trim() : 'Not specified',
-                                            roomORwindow: fields[5] ? fields[5].trim() : 'Not specified',
-                                            registrationDate: fields[6] ? fields[6].trim() : 'Not specified',
-                                            stream: fields[7] ? fields[7].trim() : 'Not specified',
-                                            dormBuilding: fields[8] ? fields[8].trim() : 'Not assigned',
-                                            dormRoom: fields[9] ? fields[9].trim() : 'Not assigned',
-                                            dormBed: fields[10] ? fields[10].trim() : 'Not assigned'
-                                        };
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        
-                        if (studentFound) {
-                            console.log('Found in CSV:', studentFound);
-                            displayStudentResult(studentFound);
-                        } else {
-                            console.log('Not found in CSV either');
-                            resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
-                        }
-                    } catch (csvError) {
-                        console.log('CSV error:', csvError);
-                        // If CSV fails, try sample data
-                        const sampleStudent = getSampleStudent(searchInput);
-                        if (sampleStudent) {
-                            console.log('Found in sample data:', sampleStudent);
-                            displayStudentResult(sampleStudent);
-                        } else {
-                            resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
-                        }
-                    }
+                    resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
                 }
                 
             } catch (error) {
@@ -2080,6 +2051,8 @@
 
         function displayStudentResult(student) {
             const resultDiv = document.getElementById('result');
+            const dormitoryInfo = document.getElementById('dormitory-info');
+            
             resultDiv.innerHTML = `
                 <div class="result-item"><span class="field-label">Student Name:</span> ${student.name}</div>
                 <div class="result-item"><span class="field-label">Student ID:</span> ${student.studentId}</div>
@@ -2091,59 +2064,12 @@
             `;
             
             // Display dormitory information if available
-            if (student.dormBuilding && student.dormBuilding !== 'Not assigned') {
+            if (student.dormBuilding && student.dormBuilding !== 'Not assigned' && dormitoryInfo) {
                 document.getElementById('dorm-building').textContent = student.dormBuilding;
                 document.getElementById('dorm-room').textContent = student.dormRoom;
                 document.getElementById('dorm-bed').textContent = student.dormBed;
                 dormitoryInfo.style.display = 'block';
             }
-        }
-
-        // Fallback function with sample data
-        function getSampleStudent(admissionNumber) {
-            const sampleData = {
-                "NGAT00000018": {
-                    admissionNumber: "NGAT00000018",
-                    studentId: "NGAT00000018",
-                    name: "Ahmed Mohammed",
-                    gender: "Male",
-                    registrationDate: "October 23-24, 2025",
-                    building: "Science Building",
-                    roomORwindow: "Window 1",
-                    stream: "Natural Science",
-                    dormBuilding: "Male Dormitory A",
-                    dormRoom: "Room 205",
-                    dormBed: "Bed 3"
-                },
-                "NGAT00000019": {
-                    admissionNumber: "NGAT00000019",
-                    studentId: "NGAT00000019",
-                    name: "Sadam Dawud",
-                    gender: "Male",
-                    registrationDate: "October 23-24, 2025",
-                    building: "Science Building",
-                    roomORwindow: "Window 2",
-                    stream: "Social Science",
-                    dormBuilding: "Male Dormitory B",
-                    dormRoom: "Room 312",
-                    dormBed: "Bed 1"
-                },
-                "NGAT00000020": {
-                    admissionNumber: "NGAT00000020",
-                    studentId: "NGAT00000020",
-                    name: "Soreti Siraj",
-                    gender: "Female",
-                    registrationDate: "October 23-24, 2025",
-                    building: "Science Building",
-                    roomORwindow: "Window 3",
-                    stream: "Natural Science",
-                    dormBuilding: "Female Dormitory C",
-                    dormRoom: "Room 108",
-                    dormBed: "Bed 2"
-                }
-            };
-            
-            return sampleData[admissionNumber] || null;
         }
 
         // ===== YOUR EXISTING JAVASCRIPT FUNCTIONS =====
