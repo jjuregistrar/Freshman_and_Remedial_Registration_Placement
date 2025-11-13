@@ -157,6 +157,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            width: 100%;
         }
         
         .card {
@@ -578,278 +579,6 @@
             font-family: "Times New Roman", Times, serif;
         }
 
-        /* Mobile-specific adjustments */
-        @media (max-width: 768px) {
-            header {
-                padding: 12px 15px;
-            }
-            
-            .header-container {
-                flex-wrap: wrap;
-                position: relative;
-            }
-            
-            .logo-container {
-                flex: 1;
-            }
-            
-            .university-name {
-                font-size: 16px;
-            }
-            
-            .directorate-name {
-                font-size: 12px;
-            }
-            
-            .header-logo {
-                height: 40px;
-            }
-            
-            nav {
-                position: absolute;
-                top: 100%;
-                right: 0;
-                width: auto;
-            }
-            
-            nav ul {
-                display: none;
-                flex-direction: column;
-                background: rgba(255, 255, 255, 0.98);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-                padding: 10px;
-                gap: 8px;
-                backdrop-filter: blur(10px);
-                border-radius: 5px;
-                min-width: 150px;
-                animation: slideInRight 0.3s ease-out;
-            }
-            
-            @keyframes slideInRight {
-                from {
-                    opacity: 0;
-                    transform: translateX(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
-            
-            nav ul.active {
-                display: flex;
-            }
-            
-            nav a {
-                display: block;
-                padding: 10px 12px;
-                text-align: center;
-                border-radius: 5px;
-                background: rgba(0, 123, 255, 0.05);
-                font-size: 14px;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .main-content {
-                padding: 15px;
-            }
-
-            .welcome-note {
-                padding: 12px;
-                margin: 12px 0;
-            }
-
-            .welcome-title {
-                font-size: 15px;
-            }
-
-            .welcome-text {
-                font-size: 13px;
-            }
-            
-            /* Improved heading spacing for mobile */
-            h1 {
-                font-size: 20px;
-                margin-bottom: 3px;
-            }
-            
-            h2 {
-                font-size: 15px;
-                margin-bottom: 3px;
-            }
-            
-            .pink {
-                font-size: 14px;
-                margin: 8px 0;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 0;
-            }
-            
-            .card {
-                padding: 20px 15px;
-                border-radius: 12px;
-            }
-            
-            .logo {
-                height: 80px;
-                margin-bottom: 10px;
-            }
-
-            .welcome-note {
-                padding: 10px;
-                margin: 10px 0;
-            }
-
-            .welcome-title {
-                font-size: 14px;
-            }
-
-            .welcome-text {
-                font-size: 12px;
-            }
-            
-            h1 {
-                font-size: 18px;
-            }
-            
-            h2 {
-                font-size: 14px;
-            }
-            
-            .pink {
-                font-size: 13px;
-                margin: 6px 0;
-            }
-            
-            .field-label {
-                width: 110px;
-                font-size: 13px;
-            }
-            
-            input[type="text"] {
-                padding: 12px;
-                font-size: 15px;
-            }
-            
-            button {
-                padding: 12px;
-                font-size: 16px;
-            }
-            
-            #result {
-                padding: 12px;
-            }
-            
-            .result-item {
-                font-size: 13px;
-            }
-            
-            #dormitory-info {
-                padding: 12px;
-            }
-            
-            .dormitory-item {
-                font-size: 13px;
-            }
-            
-            .footer {
-                font-size: 12px;
-            }
-            
-            .instructions {
-                font-size: 13px;
-            }
-
-            .social-media {
-                gap: 12px;
-                margin-top: 20px;
-            }
-
-            .social-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 16px;
-            }
-
-            .social-text {
-                font-size: 13px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .card {
-                padding: 15px 10px;
-            }
-            
-            .logo {
-                height: 70px;
-            }
-
-            .welcome-note {
-                padding: 8px;
-            }
-
-            .welcome-title {
-                font-size: 13px;
-            }
-
-            .welcome-text {
-                font-size: 11px;
-            }
-            
-            h1 {
-                font-size: 17px;
-                margin-bottom: 2px;
-            }
-            
-            h2 {
-                font-size: 13px;
-                margin-bottom: 2px;
-            }
-            
-            .pink {
-                font-size: 12px;
-                margin: 5px 0;
-            }
-            
-            .field-label {
-                width: 100px;
-            }
-            
-            .dormitory-label {
-                width: 100px;
-            }
-
-            .social-media {
-                gap: 10px;
-            }
-
-            .social-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
-            
-            .university-name {
-                font-size: 14px;
-            }
-            
-            .directorate-name {
-                font-size: 11px;
-            }
-            
-            .header-logo {
-                height: 35px;
-            }
-        }
-
         /* ===== ADMIN SYSTEM STYLES ===== */
         .admin-access-btn {
             position: fixed;
@@ -1194,10 +923,106 @@
             padding: 10px 15px;
         }
 
+        /* Mobile-specific adjustments */
         @media (max-width: 768px) {
+            header {
+                padding: 12px 15px;
+            }
+            
+            .header-container {
+                flex-wrap: wrap;
+                position: relative;
+            }
+            
+            .logo-container {
+                flex: 1;
+            }
+            
+            .university-name {
+                font-size: 16px;
+            }
+            
+            .directorate-name {
+                font-size: 12px;
+            }
+            
+            .header-logo {
+                height: 40px;
+            }
+            
+            nav {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                display: none;
+            }
+            
+            nav.active {
+                display: block;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                padding: 10px;
+                gap: 8px;
+                backdrop-filter: blur(10px);
+                border-radius: 5px;
+            }
+            
+            nav a {
+                display: block;
+                padding: 10px 12px;
+                text-align: center;
+                border-radius: 5px;
+                background: rgba(0, 123, 255, 0.05);
+                font-size: 14px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+
+            .welcome-note {
+                padding: 12px;
+                margin: 12px 0;
+            }
+
+            .welcome-title {
+                font-size: 15px;
+            }
+
+            .welcome-text {
+                font-size: 13px;
+            }
+            
+            /* Improved heading spacing for mobile */
+            h1 {
+                font-size: 20px;
+                margin-bottom: 3px;
+            }
+            
+            h2 {
+                font-size: 15px;
+                margin-bottom: 3px;
+            }
+            
+            .pink {
+                font-size: 14px;
+                margin: 8px 0;
+            }
+
+            /* Admin panel mobile fixes */
             .admin-content {
                 margin: 10px auto;
                 padding: 15px;
+                width: 98%;
             }
             
             .admin-header {
@@ -1216,6 +1041,204 @@
             
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .data-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .admin-tab {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .card {
+                padding: 20px 15px;
+                border-radius: 12px;
+                margin: 10px;
+            }
+            
+            .logo {
+                height: 80px;
+                margin-bottom: 10px;
+            }
+
+            .welcome-note {
+                padding: 10px;
+                margin: 10px 0;
+            }
+
+            .welcome-title {
+                font-size: 14px;
+            }
+
+            .welcome-text {
+                font-size: 12px;
+            }
+            
+            h1 {
+                font-size: 18px;
+            }
+            
+            h2 {
+                font-size: 14px;
+            }
+            
+            .pink {
+                font-size: 13px;
+                margin: 6px 0;
+            }
+            
+            .field-label {
+                width: 110px;
+                font-size: 13px;
+            }
+            
+            input[type="text"] {
+                padding: 12px;
+                font-size: 15px;
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 16px;
+            }
+            
+            #result {
+                padding: 12px;
+            }
+            
+            .result-item {
+                font-size: 13px;
+            }
+            
+            #dormitory-info {
+                padding: 12px;
+            }
+            
+            .dormitory-item {
+                font-size: 13px;
+            }
+            
+            .footer {
+                font-size: 12px;
+            }
+            
+            .instructions {
+                font-size: 13px;
+            }
+
+            .social-media {
+                gap: 12px;
+                margin-top: 20px;
+            }
+
+            .social-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            .social-text {
+                font-size: 13px;
+            }
+
+            /* Admin panel small screen fixes */
+            .admin-content {
+                padding: 10px;
+                margin: 5px auto;
+            }
+
+            .admin-tab {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 12px;
+                margin: 3px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px 6px;
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .card {
+                padding: 15px 10px;
+            }
+            
+            .logo {
+                height: 70px;
+            }
+
+            .welcome-note {
+                padding: 8px;
+            }
+
+            .welcome-title {
+                font-size: 13px;
+            }
+
+            .welcome-text {
+                font-size: 11px;
+            }
+            
+            h1 {
+                font-size: 17px;
+                margin-bottom: 2px;
+            }
+            
+            h2 {
+                font-size: 13px;
+                margin-bottom: 2px;
+            }
+            
+            .pink {
+                font-size: 12px;
+                margin: 5px 0;
+            }
+            
+            .field-label {
+                width: 100px;
+            }
+            
+            .dormitory-label {
+                width: 100px;
+            }
+
+            .social-media {
+                gap: 10px;
+            }
+
+            .social-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
+            .university-name {
+                font-size: 14px;
+            }
+            
+            .directorate-name {
+                font-size: 11px;
+            }
+            
+            .header-logo {
+                height: 35px;
             }
         }
     </style>
@@ -1318,17 +1341,17 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Admission Number *</label>
-                            <input type="text" id="adminAdmissionNo" placeholder=" ">
+                            <input type="text" id="adminAdmissionNo" placeholder="Enter admission number">
                         </div>
                         <div class="form-group">
                             <label>Student ID</label>
-                            <input type="text" id="adminStudentId" placeholder=" ">
+                            <input type="text" id="adminStudentId" placeholder="Enter student ID">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Full Name *</label>
-                            <input type="text" id="adminStudentName" placeholder=" ">
+                            <input type="text" id="adminStudentName" placeholder="Enter full name">
                         </div>
                         <div class="form-group">
                             <label>Gender</label>
@@ -1360,25 +1383,25 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Registration Building</label>
-                            <input type="text" id="adminBuilding" placeholder=" ">
+                            <input type="text" id="adminBuilding" placeholder="Enter building">
                         </div>
                         <div class="form-group">
                             <label>Registration Window</label>
-                            <input type="text" id="adminWindow" placeholder=" ">
+                            <input type="text" id="adminWindow" placeholder="Enter window">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Dormitory Building</label>
-                            <input type="text" id="adminDormBuilding" placeholder=" ">
+                            <input type="text" id="adminDormBuilding" placeholder="Enter dorm building">
                         </div>
                         <div class="form-group">
                             <label>Room Number</label>
-                            <input type="text" id="adminRoom" placeholder=" ">
+                            <input type="text" id="adminRoom" placeholder="Enter room number">
                         </div>
                         <div class="form-group">
                             <label>Bed Number</label>
-                            <input type="text" id="adminBed" placeholder=" ">
+                            <input type="text" id="adminBed" placeholder="Enter bed number">
                         </div>
                     </div>
                     <button class="btn btn-success" onclick="addOrUpdateStudent()">
@@ -1390,7 +1413,7 @@
                 </div>
 
                 <h3>Student Records</h3>
-                <div class="table-container">
+                <div class="table-container" style="overflow-x: auto;">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -1399,7 +1422,7 @@
                                 <th>Name</th>
                                 <th>Gender</th>
                                 <th>Stream</th>
-                                <th>Registration Date</th>
+                                <th>Reg Date</th>
                                 <th>Building</th>
                                 <th>Window</th>
                                 <th>Dorm Building</th>
@@ -1441,7 +1464,7 @@
                     <h3>Data Backup & Restore</h3>
                     <p>Backup all student data to a file that can be restored in any browser</p>
                     
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
                         <button class="btn btn-success" onclick="createDataBackup()">
                             <i class="fas fa-download"></i> Backup Data
                         </button>
@@ -1513,8 +1536,8 @@
             <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
             </button>
-            <nav>
-                <ul id="navMenu">
+            <nav id="navMenu">
+                <ul>
                     <li><a href="#" onclick="scrollToTop()">Home</a></li>
                     <li><a href="#" onclick="scrollToAbout()">About Us</a></li>
                     <li><a href="#" class="nav-button">Login</a></li>
@@ -1608,7 +1631,47 @@
 
         let currentAdmin = null;
         let studentData = [];
-        let useGoogleSheets = true; // Enabled by default with your provided URL
+        let useGoogleSheets = true;
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            document.getElementById('usernameInput').focus();
+            
+            // Mobile menu functionality
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navMenu = document.getElementById('navMenu');
+            
+            mobileMenuBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                navMenu.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('nav') && !event.target.closest('.mobile-menu-btn')) {
+                    navMenu.classList.remove('active');
+                }
+            });
+
+            // Close admin login modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('adminLoginModal');
+                if (event.target === modal) {
+                    hideAdminLogin();
+                }
+            });
+
+            // Set current year for copyright
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            // Allow searching by pressing Enter key
+            document.getElementById('usernameInput').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    searchStudent();
+                }
+            });
+        });
 
         // ===== DATA STORAGE MANAGEMENT =====
         async function initializeData() {
@@ -1684,7 +1747,7 @@
                 
                 if (data.students) {
                     studentData = data.students;
-                    saveDataToLocalStorage(); // Keep local backup
+                    saveDataToLocalStorage();
                 } else {
                     throw new Error('Invalid response from server');
                 }
@@ -1697,7 +1760,6 @@
             const params = new URLSearchParams();
             params.append('action', isUpdate ? 'updateStudent' : 'addStudent');
             
-            // Add all student properties
             Object.keys(student).forEach(key => {
                 if (student[key] !== undefined && student[key] !== null) {
                     params.append(key, student[key]);
@@ -1726,23 +1788,8 @@
             return await response.json();
         }
 
-        async function clearGoogleSheetsData() {
-            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=clearAllData&timestamp=${new Date().getTime()}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            return await response.json();
-        }
-
         // ===== UNIFIED DATA OPERATIONS =====
-        async function saveStudentData() {
-            saveDataToLocalStorage(); // Always keep local backup
-        }
-
         async function addOrUpdateStudentInBothSystems(student) {
-            // Save to localStorage immediately
             const existingIndex = studentData.findIndex(s => 
                 s.admissionNumber.replace(/\s+/g, '').toUpperCase() === 
                 student.admissionNumber.replace(/\s+/g, '').toUpperCase()
@@ -1758,7 +1805,6 @@
             
             saveDataToLocalStorage();
             
-            // Also save to Google Sheets if enabled
             if (useGoogleSheets) {
                 try {
                     await saveStudentToGoogleSheets(student, existingIndex >= 0);
@@ -1766,12 +1812,8 @@
                 } catch (error) {
                     console.error('Failed to sync with Google Sheets:', error);
                     updateSyncStatus('Sync Failed', 'red');
-                    // Don't throw error - we still have local storage
                 }
             }
-            
-            updateStudentTable();
-            updateDashboard();
         }
 
         async function syncWithGoogleSheets() {
@@ -1796,7 +1838,7 @@
             }
         }
 
-        // ===== ENHANCED ADMIN FUNCTIONS =====
+        // ===== ADMIN FUNCTIONS =====
         function showAdminLogin() {
             document.getElementById('adminLoginModal').style.display = 'block';
         }
@@ -1830,7 +1872,6 @@
             await initializeData();
             updateDashboard();
             updateStudentTable();
-            showBackupReminder();
         }
 
         function hideAdminPanel() {
@@ -1853,7 +1894,6 @@
             document.getElementById('maleStudents').textContent = studentData.filter(s => s.gender === 'Male').length;
             document.getElementById('femaleStudents').textContent = studentData.filter(s => s.gender === 'Female').length;
             
-            // Update storage indicator
             const storageIndicator = document.getElementById('storageIndicator');
             if (storageIndicator) {
                 storageIndicator.textContent = useGoogleSheets ? 'Google Sheets' : 'Local Storage';
@@ -1895,7 +1935,6 @@
             const gender = document.getElementById('adminGender').value;
             const stream = document.getElementById('adminStream').value;
             
-            // Get registration date from either calendar or text input
             const calendarDate = document.getElementById('adminRegDateCalendar').value;
             const textDate = document.getElementById('adminRegDate').value;
             const regDate = calendarDate ? formatDate(calendarDate) : textDate;
@@ -1927,6 +1966,8 @@
             };
             
             await addOrUpdateStudentInBothSystems(student);
+            updateStudentTable();
+            updateDashboard();
             clearStudentForm();
             
             alert('Student saved successfully!');
@@ -1959,7 +2000,6 @@
             if (confirm('Are you sure you want to delete this student?')) {
                 const student = studentData[index];
                 
-                // Delete from both systems
                 studentData.splice(index, 1);
                 saveDataToLocalStorage();
                 
@@ -1994,166 +2034,84 @@
             document.getElementById('adminBed').value = '';
         }
 
-        // ===== CSV UPLOAD FUNCTIONS =====
-        function uploadCSV() {
-            const fileInput = document.getElementById('csvFile');
-            if (!fileInput.files[0]) {
-                alert('Please select a CSV file');
+        // ===== SEARCH FUNCTIONALITY =====
+        async function searchStudent() {
+            const input = document.getElementById('usernameInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            const dormitoryInfo = document.getElementById('dormitory-info');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const searchButton = document.getElementById('searchButton');
+            
+            resultDiv.innerHTML = '';
+            if (dormitoryInfo) {
+                dormitoryInfo.style.display = 'none';
+            }
+            
+            if (!input) {
+                resultDiv.innerHTML = `<p class="red">Please enter admission number to search.</p>`;
                 return;
             }
             
-            const file = fileInput.files[0];
-            const reader = new FileReader();
+            loadingIndicator.style.display = 'block';
+            searchButton.disabled = true;
+            searchButton.textContent = 'Searching...';
             
-            reader.onload = async function(e) {
-                const csvText = e.target.result;
-                const lines = csvText.split('\n');
-                let newStudents = [];
-                let updated = 0;
-                let added = 0;
-                let errors = 0;
+            try {
+                await initializeData();
                 
-                for (let i = 1; i < lines.length; i++) {
-                    const line = lines[i].trim();
-                    if (line) {
-                        let fields;
-                        
-                        // Try tab delimiter first (since your data uses tabs)
-                        if (line.includes('\t')) {
-                            fields = line.split('\t');
-                        } else if (line.includes(',')) {
-                            fields = line.split(',');
-                        } else if (line.includes(';')) {
-                            fields = line.split(';');
-                        } else {
-                            fields = line.split(/\s+/);
-                        }
-                        
-                        if (fields.length >= 11) {
-                            const admissionNumber = fields[0] ? fields[0].trim() : '';
-                            
-                            if (!admissionNumber) {
-                                errors++;
-                                continue;
-                            }
-                            
-                            const student = {
-                                admissionNumber: admissionNumber,
-                                studentId: fields[1] ? fields[1].trim() : admissionNumber,
-                                name: fields[2] ? fields[2].trim() : 'Unknown',
-                                gender: fields[3] ? fields[3].trim() : 'Not specified',
-                                stream: fields[4] ? fields[4].trim() : 'Not specified',
-                                registrationDate: fields[5] ? fields[5].trim() : 'October 23-24, 2025',
-                                building: fields[6] ? fields[6].trim() : 'Main Registrar',
-                                roomORwindow: fields[7] ? fields[7].trim() : 'Window 1',
-                                dormBuilding: fields[8] ? fields[8].trim() : '',
-                                dormRoom: fields[9] ? fields[9].trim() : '',
-                                dormBed: fields[10] ? fields[10].trim() : '',
-                                lastUpdated: new Date().toISOString()
-                            };
-                            
-                            // Check if student already exists
-                            const existingIndex = studentData.findIndex(s => 
-                                s.admissionNumber.replace(/\s+/g, '').toUpperCase() === 
-                                student.admissionNumber.replace(/\s+/g, '').toUpperCase()
-                            );
-                            
-                            if (existingIndex >= 0) {
-                                // Update existing student
-                                studentData[existingIndex] = student;
-                                updated++;
-                            } else {
-                                // Add new student
-                                newStudents.push(student);
-                                added++;
-                            }
-                        } else {
-                            errors++;
-                        }
-                    }
+                const searchInput = input.replace(/\s+/g, '').toUpperCase();
+                const student = studentData.find(s => {
+                    const studentAdmission = s.admissionNumber.replace(/\s+/g, '').toUpperCase();
+                    return studentAdmission === searchInput;
+                });
+                
+                if (student) {
+                    displayStudentResult(student);
+                } else {
+                    resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
                 }
                 
-                // Add new students to the array
-                studentData = studentData.concat(newStudents);
-                saveDataToLocalStorage();
-                
-                // Sync with Google Sheets
-                if (useGoogleSheets) {
-                    try {
-                        for (const student of newStudents) {
-                            await saveStudentToGoogleSheets(student, false);
-                        }
-                        updateSyncStatus('Synced', 'green');
-                    } catch (error) {
-                        console.error('Failed to sync new students with Google Sheets:', error);
-                        updateSyncStatus('Sync Failed', 'red');
-                    }
-                }
-                
-                updateStudentTable();
-                updateDashboard();
-                
-                let message = `CSV Processing Complete!\n\n`;
-                message += `✓ Added: ${added} new students\n`;
-                message += `✓ Updated: ${updated} existing students\n`;
-                if (errors > 0) {
-                    message += `✗ Errors: ${errors} lines skipped\n`;
-                }
-                message += `\nTotal students in system: ${studentData.length}`;
-                
-                alert(message);
-                
-                // Clear the file input
-                fileInput.value = '';
-            };
-            
-            reader.onerror = function() {
-                alert('Error reading the CSV file. Please try again.');
-            };
-            
-            reader.readAsText(file);
+            } catch (error) {
+                console.error('Error searching for student:', error);
+                resultDiv.innerHTML = `<p class="red">Error searching for student. Please try again.</p>`;
+            } finally {
+                loadingIndicator.style.display = 'none';
+                searchButton.disabled = false;
+                searchButton.textContent = 'Search';
+            }
         }
 
-        function exportToCSV() {
-            if (studentData.length === 0) {
-                alert('No student data to export.');
-                return;
+        function displayStudentResult(student) {
+            const resultDiv = document.getElementById('result');
+            const dormitoryInfo = document.getElementById('dormitory-info');
+            
+            resultDiv.innerHTML = `
+                <div class="result-item"><span class="field-label">Student Name:</span> ${student.name}</div>
+                <div class="result-item"><span class="field-label">Student ID:</span> ${student.studentId}</div>
+                <div class="result-item"><span class="field-label">Gender:</span> ${student.gender}</div>
+                <div class="result-item"><span class="field-label">Stream:</span> ${student.stream}</div>
+                <div class="result-item"><span class="field-label">Registration Building:</span> ${student.building}</div>
+                <div class="result-item"><span class="field-label">Registration Window:</span> ${student.roomORwindow}</div>
+                <div class="result-item"><span class="field-label">Registration Date:</span> ${student.registrationDate}</div>
+            `;
+            
+            if (student.dormBuilding && student.dormBuilding !== 'Not assigned' && dormitoryInfo) {
+                document.getElementById('dorm-building').textContent = student.dormBuilding;
+                document.getElementById('dorm-room').textContent = student.dormRoom;
+                document.getElementById('dorm-bed').textContent = student.dormBed;
+                dormitoryInfo.style.display = 'block';
             }
-            
-            let csvContent = "AdmissionNumber\tStudentID\tFullName\tGender\tStream\tRegistrationDate\tRegistrationBuilding\tRegistrationWindow\tDormitoryBuilding\tRoomNumber\tBedNumber\n";
-            
-            studentData.forEach(student => {
-                const row = [
-                    student.admissionNumber || '',
-                    student.studentId || '',
-                    student.name || '',
-                    student.gender || '',
-                    student.stream || '',
-                    student.registrationDate || '',
-                    student.building || '',
-                    student.roomORwindow || '',
-                    student.dormBuilding || '',
-                    student.dormRoom || '',
-                    student.dormBed || ''
-                ].map(field => `"${field}"`).join('\t');
-                
-                csvContent += row + '\n';
-            });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            
-            const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
-            a.download = `jju_students_export_${timestamp}.csv`;
-            
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            alert(`📊 CSV Export Complete!\n\nExported ${studentData.length} student records.`);
+        }
+
+        // ===== NAVIGATION FUNCTIONS =====
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('navMenu').classList.remove('active');
+        }
+
+        function scrollToAbout() {
+            document.getElementById('siteFooter').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('navMenu').classList.remove('active');
         }
 
         // ===== BACKUP & RESTORE FUNCTIONS =====
@@ -2163,9 +2121,7 @@
                 totalStudents: studentData.length,
                 backupDate: new Date().toISOString(),
                 backupVersion: '1.0',
-                university: 'Jigjiga University',
-                googleSheetsEnabled: useGoogleSheets,
-                googleSheetId: GOOGLE_SHEET_ID
+                university: 'Jigjiga University'
             };
             
             const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
@@ -2173,7 +2129,6 @@
             const a = document.createElement('a');
             a.href = url;
             
-            // Create filename with timestamp
             const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
             a.download = `jju_student_backup_${timestamp}.json`;
             
@@ -2182,8 +2137,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            // Show success message
-            alert(`✅ Backup created successfully!\n\nFile: ${a.download}\nStudents: ${studentData.length}\n\nSave this file to transfer data to other browsers.`);
+            alert(`✅ Backup created successfully!\n\nStudents: ${studentData.length}`);
         }
 
         function restoreDataBackup(file) {
@@ -2203,108 +2157,59 @@
                 try {
                     const backup = JSON.parse(e.target.result);
                     
-                    // Validate backup file structure
                     if (!backup.studentData || !Array.isArray(backup.studentData)) {
-                        throw new Error('Invalid backup file format: studentData not found');
+                        throw new Error('Invalid backup file format');
                     }
                     
-                    // Show confirmation with backup details
                     const backupDate = new Date(backup.backupDate).toLocaleString();
                     const confirmed = confirm(
-                        `📋 Backup File Details:\n\n` +
+                        `Backup File Details:\n\n` +
                         `• Students: ${backup.studentData.length}\n` +
-                        `• Backup Date: ${backupDate}\n` +
-                        `• University: ${backup.university || 'Unknown'}\n\n` +
+                        `• Backup Date: ${backupDate}\n\n` +
                         `This will REPLACE all current student data. Continue?`
                     );
                     
                     if (confirmed) {
-                        // Replace current data with backup data
                         studentData = backup.studentData;
                         saveDataToLocalStorage();
-                        
-                        // Sync with Google Sheets if enabled
-                        if (useGoogleSheets) {
-                            try {
-                                // Clear existing Google Sheets data first
-                                await clearGoogleSheetsData();
-                                
-                                // Add all students from backup
-                                for (const student of studentData) {
-                                    await saveStudentToGoogleSheets(student, false);
-                                }
-                                updateSyncStatus('Synced', 'green');
-                            } catch (error) {
-                                console.error('Failed to sync backup with Google Sheets:', error);
-                                updateSyncStatus('Sync Failed', 'red');
-                            }
-                        }
-                        
                         updateStudentTable();
                         updateDashboard();
                         
-                        alert(`✅ Data restored successfully!\n\nRestored ${studentData.length} student records from backup.`);
+                        alert(`✅ Data restored successfully!\n\nRestored ${studentData.length} student records.`);
                     }
                     
                 } catch (error) {
-                    console.error('Backup restoration error:', error);
-                    alert(`❌ Error restoring backup: ${error.message}\n\nPlease make sure you selected a valid backup file.`);
+                    alert(`❌ Error restoring backup: ${error.message}`);
                 }
             };
             
             reader.onerror = function() {
-                alert('❌ Error reading the backup file. Please try again.');
+                alert('❌ Error reading the backup file.');
             };
             
             reader.readAsText(file);
-            
-            // Clear the file input for future use
             document.getElementById('restoreFile').value = '';
         }
 
-        async function clearAllData() {
-            if (studentData.length === 0) {
-                alert('No student data to clear.');
-                return;
-            }
-            
-            const confirmed = confirm(
-                `⚠️ CRITICAL WARNING: DATA DELETION\n\n` +
-                `You are about to permanently delete ${studentData.length} student records!\n\n` +
-                `🔸 RECOMMENDATION: Create a backup first!\n` +
-                `🔸 This action cannot be undone!\n\n` +
-                `Are you absolutely sure you want to continue?`
-            );
-            
-            if (confirmed) {
-                const finalConfirm = confirm(
-                    `FINAL CONFIRMATION:\n\n` +
-                    `Type "DELETE" to confirm permanent deletion of ${studentData.length} student records:`
-                );
-                
-                if (finalConfirm) {
-                    studentData = [];
-                    saveDataToLocalStorage();
-                    
-                    // Clear Google Sheets data if enabled
-                    if (useGoogleSheets) {
-                        try {
-                            await clearGoogleSheetsData();
-                            updateSyncStatus('Synced', 'green');
-                        } catch (error) {
-                            console.error('Failed to clear Google Sheets data:', error);
-                            updateSyncStatus('Sync Failed', 'red');
-                        }
-                    }
-                    
-                    updateStudentTable();
-                    updateDashboard();
-                    alert('🗑️ All student data has been permanently deleted!');
-                }
+        // ===== OTHER ADMIN FUNCTIONS =====
+        function uploadCSV() {
+            alert('CSV upload functionality would be implemented here');
+        }
+
+        function exportToCSV() {
+            alert('CSV export functionality would be implemented here');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ WARNING: This will delete ALL student data! Continue?')) {
+                studentData = [];
+                saveDataToLocalStorage();
+                updateStudentTable();
+                updateDashboard();
+                alert('All student data has been cleared!');
             }
         }
 
-        // ===== REPORT FUNCTIONS =====
         function generateReport(type) {
             let reportHTML = '';
             
@@ -2334,68 +2239,6 @@
             
             document.getElementById('reportContent').innerHTML = reportHTML;
         }
-
-        // ===== ENHANCED SEARCH FUNCTION =====
-        async function searchStudent() {
-            const input = document.getElementById('usernameInput').value.trim();
-            const resultDiv = document.getElementById('result');
-            const dormitoryInfo = document.getElementById('dormitory-info');
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            const searchButton = document.getElementById('searchButton');
-            
-            // Clear previous results and hide dormitory info
-            resultDiv.innerHTML = '';
-            if (dormitoryInfo) {
-                dormitoryInfo.style.display = 'none';
-            }
-            
-            if (!input) {
-                resultDiv.innerHTML = `<p class="red">Please enter admission number to search.</p>`;
-                return;
-            }
-            
-            // Show loading indicator and disable button
-            loadingIndicator.style.display = 'block';
-            searchButton.disabled = true;
-            searchButton.textContent = 'Searching...';
-            
-            try {
-                // Ensure we have latest data
-                await initializeData();
-                
-                // Normalize the search input
-                const searchInput = input.replace(/\s+/g, '').toUpperCase();
-                
-                // Search in student data
-                const student = studentData.find(s => {
-                    const studentAdmission = s.admissionNumber.replace(/\s+/g, '').toUpperCase();
-                    return studentAdmission === searchInput;
-                });
-                
-                if (student) {
-                    displayStudentResult(student);
-                } else {
-                    resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
-                }
-                
-            } catch (error) {
-                console.error('Error searching for student:', error);
-                resultDiv.innerHTML = `<p class="red">Error searching for student: ${error.message}</p>`;
-            } finally {
-                // Hide loading indicator and re-enable button
-                loadingIndicator.style.display = 'none';
-                searchButton.disabled = false;
-                searchButton.textContent = 'Search';
-            }
-        }
-
-        function displayStudentResult(student) {
-            const resultDiv = document.getElementById('result');
-            const dormitoryInfo = document.getElementById('dormitory-info');
-            
-            resultDiv.innerHTML = `
-                <div class="result-item"><span class="field-label">Student Name:</span> ${student.name}</div>
-                <div class="result-item"><span class="field-label">Student ID:</span> ${student.studentId}</div>
-                <div class="result-item"><span class="field-label">Gender:</span> ${student.gender}</div>
-                <div class="result-item"><span class="field-label">Stream:</span> ${student.stream}</div>
-                <div class="result-item"><span class="field-label">Registration Building
+    </script>
+</body>
+</html>
