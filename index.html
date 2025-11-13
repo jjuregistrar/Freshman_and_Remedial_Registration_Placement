@@ -365,6 +365,12 @@
             font-weight: bold;
             font-family: "Times New Roman", Times, serif;
         }
+
+        .orange {
+            color: orange;
+            font-weight: bold;
+            font-family: "Times New Roman", Times, serif;
+        }
         
         #result {
             margin-top: 20px;
@@ -1450,6 +1456,9 @@
                     <button class="btn btn-primary" onclick="uploadCSV()">
                         <i class="fas fa-upload"></i> Upload CSV
                     </button>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                        CSV Format: AdmissionNumber,StudentID,FullName,Gender,Stream,RegistrationDate,RegistrationBuilding,RegistrationWindow,DormitoryBuilding,RoomNumber,BedNumber
+                    </p>
                 </div>
 
                 <div class="admin-form">
@@ -1620,8 +1629,7 @@
 
     <script>
         // ===== GOOGLE SHEETS CONFIGURATION =====
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvmhnWQ1M7-DvasD9M98HF50Q0k1ACscFRFPKqJC86dbJoRlex0Dh9Eq9BXvCDClufJA/exec';
-        const GOOGLE_SHEET_ID = '1_W_kVy4RcGcEw5zlXaMV5kd_aWeBYWV_qqjNzNWXwu4';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQO8NxRwFB7lbRR-rOial1AFT2KnaojAmJnrqPcTT93QN2eMyfufl76VHD3Vk33yPQQg/exec';
 
         // ===== ADMIN AUTHENTICATION =====
         const adminCredentials = {
@@ -1684,7 +1692,7 @@
                 } catch (error) {
                     console.error('Failed to load from Google Sheets, using localStorage:', error);
                     loadDataFromLocalStorage();
-                    updateSyncStatus('Offline - Using Local Storage', 'red');
+                    updateSyncStatus('Offline - Using Local Storage', 'orange');
                 }
             } else {
                 loadDataFromLocalStorage();
@@ -1739,53 +1747,81 @@
         // ===== GOOGLE SHEETS API FUNCTIONS =====
         async function loadDataFromGoogleSheets() {
             try {
-                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAllStudents&timestamp=${new Date().getTime()}`);
+                // Add timestamp to avoid caching issues
+                const timestamp = new Date().getTime();
+                const url = `${GOOGLE_SCRIPT_URL}?action=getAllStudents&timestamp=${timestamp}`;
+                
+                console.log('Fetching data from:', url);
+                
+                const response = await fetch(url);
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                
                 const data = await response.json();
                 
-                if (data.students) {
+                if (data && data.students) {
                     studentData = data.students;
                     saveDataToLocalStorage();
+                    console.log('Successfully loaded', studentData.length, 'students from Google Sheets');
                 } else {
-                    throw new Error('Invalid response from server');
+                    throw new Error('Invalid response format from server');
                 }
             } catch (error) {
+                console.error('Google Sheets load error:', error);
                 throw new Error(`Failed to load data: ${error.message}`);
             }
         }
 
         async function saveStudentToGoogleSheets(student, isUpdate = false) {
-            const params = new URLSearchParams();
-            params.append('action', isUpdate ? 'updateStudent' : 'addStudent');
-            
-            Object.keys(student).forEach(key => {
-                if (student[key] !== undefined && student[key] !== null) {
-                    params.append(key, student[key]);
+            try {
+                const params = new URLSearchParams();
+                params.append('action', isUpdate ? 'updateStudent' : 'addStudent');
+                
+                Object.keys(student).forEach(key => {
+                    if (student[key] !== undefined && student[key] !== null) {
+                        params.append(key, student[key]);
+                    }
+                });
+                
+                console.log('Saving student to Google Sheets:', student.admissionNumber);
+                
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: params
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            });
-            
-            const response = await fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                body: params
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const result = await response.json();
+                console.log('Save result:', result);
+                return result;
+                
+            } catch (error) {
+                console.error('Error saving to Google Sheets:', error);
+                throw error;
             }
-            
-            return await response.json();
         }
 
         async function deleteStudentFromGoogleSheets(admissionNumber) {
-            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=deleteStudent&admissionNumber=${admissionNumber}&timestamp=${new Date().getTime()}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            try {
+                const timestamp = new Date().getTime();
+                const url = `${GOOGLE_SCRIPT_URL}?action=deleteStudent&admissionNumber=${admissionNumber}&timestamp=${timestamp}`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error deleting from Google Sheets:', error);
+                throw error;
             }
-            
-            return await response.json();
         }
 
         // ===== UNIFIED DATA OPERATIONS =====
@@ -1809,11 +1845,15 @@
                 try {
                     await saveStudentToGoogleSheets(student, existingIndex >= 0);
                     updateSyncStatus('Synced', 'green');
+                    return true;
                 } catch (error) {
                     console.error('Failed to sync with Google Sheets:', error);
-                    updateSyncStatus('Sync Failed', 'red');
+                    updateSyncStatus('Sync Failed - Using Local', 'orange');
+                    // Don't throw error - we still have local storage
+                    return false;
                 }
             }
+            return true;
         }
 
         async function syncWithGoogleSheets() {
@@ -1823,10 +1863,11 @@
                 updateSyncStatus('Synced', 'green');
                 updateStudentTable();
                 updateDashboard();
-                alert('Data synced successfully with Google Sheets!');
+                alert('✅ Data synced successfully with Google Sheets!');
             } catch (error) {
+                console.error('Sync error:', error);
                 updateSyncStatus('Sync Failed', 'red');
-                alert('Failed to sync with Google Sheets: ' + error.message);
+                alert('❌ Failed to sync with Google Sheets. Using local data.\nError: ' + error.message);
             }
         }
 
@@ -1836,6 +1877,204 @@
                 syncStatus.textContent = message;
                 syncStatus.className = color;
             }
+        }
+
+        // ===== CSV UPLOAD FUNCTIONALITY =====
+        function uploadCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a CSV file first.');
+                return;
+            }
+            
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a valid CSV file.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = async function(e) {
+                try {
+                    const csvText = e.target.result;
+                    const results = await processCSVData(csvText);
+                    
+                    if (results.added > 0 || results.updated > 0) {
+                        // Save to localStorage
+                        saveDataToLocalStorage();
+                        
+                        // Try to sync with Google Sheets
+                        if (useGoogleSheets) {
+                            try {
+                                for (const student of results.newStudents) {
+                                    await saveStudentToGoogleSheets(student, false);
+                                }
+                                updateSyncStatus('Synced', 'green');
+                            } catch (error) {
+                                console.error('Failed to sync new students with Google Sheets:', error);
+                                updateSyncStatus('Sync Failed - Using Local', 'orange');
+                            }
+                        }
+                        
+                        updateStudentTable();
+                        updateDashboard();
+                        
+                        let message = `✅ CSV Processing Complete!\n\n`;
+                        message += `✓ Added: ${results.added} new students\n`;
+                        message += `✓ Updated: ${results.updated} existing students\n`;
+                        if (results.errors > 0) {
+                            message += `✗ Errors: ${results.errors} lines skipped\n`;
+                        }
+                        message += `\nTotal students in system: ${studentData.length}`;
+                        
+                        alert(message);
+                    } else {
+                        alert('No valid student data found in the CSV file.');
+                    }
+                    
+                } catch (error) {
+                    console.error('Error processing CSV:', error);
+                    alert('❌ Error processing CSV file: ' + error.message);
+                } finally {
+                    // Clear the file input
+                    fileInput.value = '';
+                }
+            };
+            
+            reader.onerror = function() {
+                alert('❌ Error reading the CSV file. Please try again.');
+                fileInput.value = '';
+            };
+            
+            reader.readAsText(file);
+        }
+
+        async function processCSVData(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            let added = 0;
+            let updated = 0;
+            let errors = 0;
+            let newStudents = [];
+            
+            // Skip header row and process each line
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                try {
+                    let fields;
+                    
+                    // Try different delimiters
+                    if (line.includes('\t')) {
+                        fields = line.split('\t');
+                    } else if (line.includes(',')) {
+                        fields = line.split(',');
+                    } else if (line.includes(';')) {
+                        fields = line.split(';');
+                    } else {
+                        fields = [line]; // Single column
+                    }
+                    
+                    // Clean fields - remove quotes and trim
+                    fields = fields.map(field => field.replace(/^"|"$/g, '').trim());
+                    
+                    if (fields.length >= 3) { // At least admission number, name, and one other field
+                        const admissionNumber = fields[0];
+                        
+                        if (!admissionNumber) {
+                            errors++;
+                            continue;
+                        }
+                        
+                        const student = {
+                            admissionNumber: admissionNumber,
+                            studentId: fields[1] || admissionNumber,
+                            name: fields[2] || 'Unknown Student',
+                            gender: (fields[3] || '').toLowerCase().includes('female') ? 'Female' : 
+                                   (fields[3] || '').toLowerCase().includes('male') ? 'Male' : 'Not Specified',
+                            stream: fields[4] || 'Not Specified',
+                            registrationDate: fields[5] || 'October 23-24, 2025',
+                            building: fields[6] || 'Main Registrar',
+                            roomORwindow: fields[7] || 'Window 1',
+                            dormBuilding: fields[8] || '',
+                            dormRoom: fields[9] || '',
+                            dormBed: fields[10] || '',
+                            lastUpdated: new Date().toISOString()
+                        };
+                        
+                        // Check if student already exists
+                        const existingIndex = studentData.findIndex(s => 
+                            s.admissionNumber.replace(/\s+/g, '').toUpperCase() === 
+                            student.admissionNumber.replace(/\s+/g, '').toUpperCase()
+                        );
+                        
+                        if (existingIndex >= 0) {
+                            // Update existing student
+                            studentData[existingIndex] = student;
+                            updated++;
+                        } else {
+                            // Add new student
+                            studentData.push(student);
+                            newStudents.push(student);
+                            added++;
+                        }
+                    } else {
+                        errors++;
+                    }
+                } catch (error) {
+                    console.error('Error processing line:', line, error);
+                    errors++;
+                }
+            }
+            
+            return { added, updated, errors, newStudents };
+        }
+
+        function exportToCSV() {
+            if (studentData.length === 0) {
+                alert('No student data to export.');
+                return;
+            }
+            
+            // CSV headers
+            let csvContent = "AdmissionNumber,StudentID,FullName,Gender,Stream,RegistrationDate,RegistrationBuilding,RegistrationWindow,DormitoryBuilding,RoomNumber,BedNumber\n";
+            
+            // Add student data
+            studentData.forEach(student => {
+                const row = [
+                    student.admissionNumber || '',
+                    student.studentId || '',
+                    `"${student.name || ''}"`,
+                    student.gender || '',
+                    student.stream || '',
+                    `"${student.registrationDate || ''}"`,
+                    student.building || '',
+                    student.roomORwindow || '',
+                    student.dormBuilding || '',
+                    student.dormRoom || '',
+                    student.dormBed || ''
+                ].join(',');
+                
+                csvContent += row + '\n';
+            });
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            a.download = `jju_students_export_${timestamp}.csv`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`📊 CSV Export Complete!\n\nExported ${studentData.length} student records.`);
         }
 
         // ===== ADMIN FUNCTIONS =====
@@ -2192,14 +2431,6 @@
         }
 
         // ===== OTHER ADMIN FUNCTIONS =====
-        function uploadCSV() {
-            alert('CSV upload functionality would be implemented here');
-        }
-
-        function exportToCSV() {
-            alert('CSV export functionality would be implemented here');
-        }
-
         function clearAllData() {
             if (confirm('⚠️ WARNING: This will delete ALL student data! Continue?')) {
                 studentData = [];
