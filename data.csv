@@ -1,7 +1,4 @@
 admissionNumber	studentId	name	gender	building	roomORwindow	registrationDate	stream	dormBuilding	dormRoom	dormBed
-7898156	JJUUGRE181556	Bie Chuol Koryom	Male	Main Registrar	Window 4	October 23-24, 2025	Natural Science	Block-25	3	1
-7425675	JJUUGRE181557	Buay Tung Tuit Tuit	Male	Main Registrar	Window 5	October 23-24, 2025	Natural Science	Block-25	3	2
-7425833	JJUUGRE181558	Nhial Gach Reat	Male	Main Registrar	Window 5	October 23-24, 2025	Natural Science	Block-25	3	3
 7404371	JJUUGRE181559	Puok Joack Biliew	Male	Main Registrar	Window 5	October 23-24, 2025	Natural Science	Block-25	3	4
 7126718	JJUUGRE181560	Abdi Ahmed Mohamed	Male	Main Registrar	Window 4	October 23-24, 2025	Natural Science	Block-25	3	5
 6429160	JJUUGRE181561	Abdi Aliyi Umer	Male	Main Registrar	Window 4	October 23-24, 2025	Natural Science	Block-25	3	6
@@ -494,3 +491,4 @@ admissionNumber	studentId	name	gender	building	roomORwindow	registrationDate	str
 8476246	JJUUGRE182048	Zeynab Farah Soyan	Female	Main Registrar	Window 4	October 23-24, 2025	Natural Science	Block-13	21	3
 6483825	JJUUGRE182049	Ziyad Kemil Yuya	Male	Main Registrar	Window 4	October 23-24, 2025	Natural Science	Block-25	53	6
 6452123	JJUUGRE182050	Zubeyri Mohammed Adem	Male	Main Registrar	Window 4	October 23-24, 2025	Natural Science	Block-25	54	1
+
