@@ -1822,10 +1822,10 @@
                         // Try tab delimiter first (since your data uses tabs)
                         if (line.includes('\t')) {
                             fields = line.split('\t');
-                        } else if (line.includes(',')) {
-                            fields = line.split(',');
-                        } else if (line.includes(';')) {
-                            fields = line.split(';');
+                        } else if (line.includes('\t')) {
+                            fields = line.split('\t');
+                        } else if (line.includes('\t')) {
+                            fields = line.split('\t');
                         } else {
                             fields = line.split(/\s+/);
                         }
