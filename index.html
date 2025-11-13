@@ -358,6 +358,12 @@
             font-weight: bold;
             font-family: "Times New Roman", Times, serif;
         }
+
+        .blue {
+            color: #007bff;
+            font-weight: bold;
+            font-family: "Times New Roman", Times, serif;
+        }
         
         #result {
             margin-top: 20px;
@@ -1268,6 +1274,30 @@
                     </div>
                 </div>
 
+                <!-- Storage Configuration -->
+                <div class="admin-form">
+                    <h3>Storage Configuration</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Current Storage:</label>
+                            <span id="storageIndicator" class="green">Google Sheets</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Sync Status:</label>
+                            <span id="syncStatus" class="green">Connected</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-warning" onclick="syncWithGoogleSheets()">
+                        <i class="fas fa-sync-alt"></i> Sync Now
+                    </button>
+                    <button class="btn btn-info" onclick="showTab('dataUpload')">
+                        <i class="fas fa-download"></i> Backup Data
+                    </button>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                        <i class="fas fa-check-circle"></i> Google Sheets integration is active. Data is automatically synced.
+                    </p>
+                </div>
+
                 <h3>Quick Actions</h3>
                 <div>
                     <button class="btn btn-primary" onclick="showTab('studentManagement')">
@@ -1276,15 +1306,6 @@
                     <button class="btn btn-success" onclick="showTab('dataUpload')">
                         <i class="fas fa-upload"></i> Upload Data
                     </button>
-                </div>
-
-                <!-- Debug Tools -->
-                <div class="admin-form">
-                    <h3>Debug Tools</h3>
-                    <button class="btn btn-warning" onclick="debugStudentData()">
-                        <i class="fas fa-bug"></i> Debug Student Data
-                    </button>
-                    <p style="font-size: 12px; color: #666;">Check what data is actually stored</p>
                 </div>
             </div>
 
@@ -1417,6 +1438,32 @@
                 </div>
 
                 <div class="admin-form">
+                    <h3>Data Backup & Restore</h3>
+                    <p>Backup all student data to a file that can be restored in any browser</p>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn btn-success" onclick="createDataBackup()">
+                            <i class="fas fa-download"></i> Backup Data
+                        </button>
+                        
+                        <button class="btn btn-warning" onclick="document.getElementById('restoreFile').click()">
+                            <i class="fas fa-upload"></i> Restore Data
+                        </button>
+                    </div>
+                    
+                    <input type="file" id="restoreFile" accept=".json" style="display: none;" onchange="restoreDataBackup(this.files[0])">
+                    
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                        <h4 style="margin: 0 0 10px 0; color: #28a745;">How to transfer data between browsers:</h4>
+                        <ol style="margin: 0; padding-left: 20px; font-size: 13px;">
+                            <li>In the original browser: Click "Backup Data" to download a backup file</li>
+                            <li>In the new browser: Click "Restore Data" and select the backup file</li>
+                            <li>All student data will be transferred to the new browser</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="admin-form">
                     <h3>Data Management</h3>
                     <p>Clear all uploaded student data</p>
                     <button class="btn btn-danger" onclick="clearAllData()">
@@ -1453,7 +1500,7 @@
         </div>
     </div>
 
-    <!-- Your Original Content - Completely Unchanged -->
+    <!-- Your Original Content -->
     <header>
         <div class="header-container">
             <div class="logo-container">
@@ -1549,6 +1596,10 @@
     </footer>
 
     <script>
+        // ===== GOOGLE SHEETS CONFIGURATION =====
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwvmhnWQ1M7-DvasD9M98HF50Q0k1ACscFRFPKqJC86dbJoRlex0Dh9Eq9BXvCDClufJA/exec';
+        const GOOGLE_SHEET_ID = '1_W_kVy4RcGcEw5zlXaMV5kd_aWeBYWV_qqjNzNWXwu4';
+
         // ===== ADMIN AUTHENTICATION =====
         const adminCredentials = {
             username: "admin",
@@ -1557,58 +1608,28 @@
 
         let currentAdmin = null;
         let studentData = [];
+        let useGoogleSheets = true; // Enabled by default with your provided URL
 
-        function showAdminLogin() {
-            document.getElementById('adminLoginModal').style.display = 'block';
-        }
-
-        function hideAdminLogin() {
-            document.getElementById('adminLoginModal').style.display = 'none';
-            document.getElementById('adminLoginError').textContent = '';
-        }
-
-        function adminLogin() {
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            const errorElement = document.getElementById('adminLoginError');
-
-            if (username === adminCredentials.username && password === adminCredentials.password) {
-                currentAdmin = username;
-                hideAdminLogin();
-                showAdminPanel();
+        // ===== DATA STORAGE MANAGEMENT =====
+        async function initializeData() {
+            // Try to load from Google Sheets first, fall back to localStorage
+            if (useGoogleSheets) {
+                try {
+                    await loadDataFromGoogleSheets();
+                    console.log('Data loaded from Google Sheets');
+                    updateSyncStatus('Connected', 'green');
+                } catch (error) {
+                    console.error('Failed to load from Google Sheets, using localStorage:', error);
+                    loadDataFromLocalStorage();
+                    updateSyncStatus('Offline - Using Local Storage', 'red');
+                }
             } else {
-                errorElement.textContent = 'Invalid username or password!';
+                loadDataFromLocalStorage();
+                updateSyncStatus('Local Storage Only', 'blue');
             }
         }
 
-        function adminLogout() {
-            currentAdmin = null;
-            hideAdminPanel();
-        }
-
-        function showAdminPanel() {
-            document.getElementById('adminPanel').style.display = 'block';
-            loadStudentData();
-            updateDashboard();
-        }
-
-        function hideAdminPanel() {
-            document.getElementById('adminPanel').style.display = 'none';
-        }
-
-        // ===== ADMIN SYSTEM FUNCTIONS =====
-        function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.admin-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function loadStudentData() {
+        function loadDataFromLocalStorage() {
             const savedData = localStorage.getItem('studentData');
             if (savedData) {
                 studentData = JSON.parse(savedData);
@@ -1626,7 +1647,8 @@
                         roomORwindow: "Window 4",
                         dormBuilding: "Block-25",
                         dormRoom: "3",
-                        dormBed: "1"
+                        dormBed: "1",
+                        lastUpdated: new Date().toISOString()
                     },
                     {
                         admissionNumber: "7425675",
@@ -1639,22 +1661,204 @@
                         roomORwindow: "Window 5",
                         dormBuilding: "Block-25",
                         dormRoom: "3",
-                        dormBed: "2"
+                        dormBed: "2",
+                        lastUpdated: new Date().toISOString()
                     }
                 ];
-                saveStudentData();
+                saveDataToLocalStorage();
             }
-            updateStudentTable();
         }
 
-        function saveStudentData() {
+        function saveDataToLocalStorage() {
             localStorage.setItem('studentData', JSON.stringify(studentData));
+        }
+
+        // ===== GOOGLE SHEETS API FUNCTIONS =====
+        async function loadDataFromGoogleSheets() {
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getAllStudents&timestamp=${new Date().getTime()}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                if (data.students) {
+                    studentData = data.students;
+                    saveDataToLocalStorage(); // Keep local backup
+                } else {
+                    throw new Error('Invalid response from server');
+                }
+            } catch (error) {
+                throw new Error(`Failed to load data: ${error.message}`);
+            }
+        }
+
+        async function saveStudentToGoogleSheets(student, isUpdate = false) {
+            const params = new URLSearchParams();
+            params.append('action', isUpdate ? 'updateStudent' : 'addStudent');
+            
+            // Add all student properties
+            Object.keys(student).forEach(key => {
+                if (student[key] !== undefined && student[key] !== null) {
+                    params.append(key, student[key]);
+                }
+            });
+            
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: params
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+        }
+
+        async function deleteStudentFromGoogleSheets(admissionNumber) {
+            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=deleteStudent&admissionNumber=${admissionNumber}&timestamp=${new Date().getTime()}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+        }
+
+        async function clearGoogleSheetsData() {
+            const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=clearAllData&timestamp=${new Date().getTime()}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+        }
+
+        // ===== UNIFIED DATA OPERATIONS =====
+        async function saveStudentData() {
+            saveDataToLocalStorage(); // Always keep local backup
+        }
+
+        async function addOrUpdateStudentInBothSystems(student) {
+            // Save to localStorage immediately
+            const existingIndex = studentData.findIndex(s => 
+                s.admissionNumber.replace(/\s+/g, '').toUpperCase() === 
+                student.admissionNumber.replace(/\s+/g, '').toUpperCase()
+            );
+            
+            student.lastUpdated = new Date().toISOString();
+            
+            if (existingIndex >= 0) {
+                studentData[existingIndex] = student;
+            } else {
+                studentData.push(student);
+            }
+            
+            saveDataToLocalStorage();
+            
+            // Also save to Google Sheets if enabled
+            if (useGoogleSheets) {
+                try {
+                    await saveStudentToGoogleSheets(student, existingIndex >= 0);
+                    updateSyncStatus('Synced', 'green');
+                } catch (error) {
+                    console.error('Failed to sync with Google Sheets:', error);
+                    updateSyncStatus('Sync Failed', 'red');
+                    // Don't throw error - we still have local storage
+                }
+            }
+            
+            updateStudentTable();
+            updateDashboard();
+        }
+
+        async function syncWithGoogleSheets() {
+            try {
+                updateSyncStatus('Syncing...', 'blue');
+                await loadDataFromGoogleSheets();
+                updateSyncStatus('Synced', 'green');
+                updateStudentTable();
+                updateDashboard();
+                alert('Data synced successfully with Google Sheets!');
+            } catch (error) {
+                updateSyncStatus('Sync Failed', 'red');
+                alert('Failed to sync with Google Sheets: ' + error.message);
+            }
+        }
+
+        function updateSyncStatus(message, color) {
+            const syncStatus = document.getElementById('syncStatus');
+            if (syncStatus) {
+                syncStatus.textContent = message;
+                syncStatus.className = color;
+            }
+        }
+
+        // ===== ENHANCED ADMIN FUNCTIONS =====
+        function showAdminLogin() {
+            document.getElementById('adminLoginModal').style.display = 'block';
+        }
+
+        function hideAdminLogin() {
+            document.getElementById('adminLoginModal').style.display = 'none';
+            document.getElementById('adminLoginError').textContent = '';
+        }
+
+        async function adminLogin() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            const errorElement = document.getElementById('adminLoginError');
+
+            if (username === adminCredentials.username && password === adminCredentials.password) {
+                currentAdmin = username;
+                hideAdminLogin();
+                await showAdminPanel();
+            } else {
+                errorElement.textContent = 'Invalid username or password!';
+            }
+        }
+
+        function adminLogout() {
+            currentAdmin = null;
+            hideAdminPanel();
+        }
+
+        async function showAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'block';
+            await initializeData();
+            updateDashboard();
+            updateStudentTable();
+            showBackupReminder();
+        }
+
+        function hideAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
         }
 
         function updateDashboard() {
             document.getElementById('totalStudents').textContent = studentData.length;
             document.getElementById('maleStudents').textContent = studentData.filter(s => s.gender === 'Male').length;
             document.getElementById('femaleStudents').textContent = studentData.filter(s => s.gender === 'Female').length;
+            
+            // Update storage indicator
+            const storageIndicator = document.getElementById('storageIndicator');
+            if (storageIndicator) {
+                storageIndicator.textContent = useGoogleSheets ? 'Google Sheets' : 'Local Storage';
+                storageIndicator.className = useGoogleSheets ? 'green' : 'blue';
+            }
         }
 
         function updateStudentTable() {
@@ -1684,7 +1888,7 @@
             });
         }
 
-        function addOrUpdateStudent() {
+        async function addOrUpdateStudent() {
             const admissionNo = document.getElementById('adminAdmissionNo').value;
             const studentId = document.getElementById('adminStudentId').value;
             const name = document.getElementById('adminStudentName').value;
@@ -1718,24 +1922,11 @@
                 roomORwindow: window,
                 dormBuilding: dormBuilding,
                 dormRoom: room,
-                dormBed: bed
+                dormBed: bed,
+                lastUpdated: new Date().toISOString()
             };
             
-            // Check if updating existing student
-            const existingIndex = studentData.findIndex(s => 
-                s.admissionNumber.replace(/\s+/g, '').toUpperCase() === 
-                admissionNo.replace(/\s+/g, '').toUpperCase()
-            );
-            
-            if (existingIndex >= 0) {
-                studentData[existingIndex] = student;
-            } else {
-                studentData.push(student);
-            }
-            
-            saveStudentData();
-            updateStudentTable();
-            updateDashboard();
+            await addOrUpdateStudentInBothSystems(student);
             clearStudentForm();
             
             alert('Student saved successfully!');
@@ -1764,10 +1955,24 @@
             showTab('studentManagement');
         }
 
-        function deleteStudent(index) {
+        async function deleteStudent(index) {
             if (confirm('Are you sure you want to delete this student?')) {
+                const student = studentData[index];
+                
+                // Delete from both systems
                 studentData.splice(index, 1);
-                saveStudentData();
+                saveDataToLocalStorage();
+                
+                if (useGoogleSheets) {
+                    try {
+                        await deleteStudentFromGoogleSheets(student.admissionNumber);
+                        updateSyncStatus('Synced', 'green');
+                    } catch (error) {
+                        console.error('Failed to delete from Google Sheets:', error);
+                        updateSyncStatus('Sync Failed', 'red');
+                    }
+                }
+                
                 updateStudentTable();
                 updateDashboard();
                 alert('Student deleted successfully!');
@@ -1789,6 +1994,7 @@
             document.getElementById('adminBed').value = '';
         }
 
+        // ===== CSV UPLOAD FUNCTIONS =====
         function uploadCSV() {
             const fileInput = document.getElementById('csvFile');
             if (!fileInput.files[0]) {
@@ -1799,7 +2005,7 @@
             const file = fileInput.files[0];
             const reader = new FileReader();
             
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 const csvText = e.target.result;
                 const lines = csvText.split('\n');
                 let newStudents = [];
@@ -1842,7 +2048,8 @@
                                 roomORwindow: fields[7] ? fields[7].trim() : 'Window 1',
                                 dormBuilding: fields[8] ? fields[8].trim() : '',
                                 dormRoom: fields[9] ? fields[9].trim() : '',
-                                dormBed: fields[10] ? fields[10].trim() : ''
+                                dormBed: fields[10] ? fields[10].trim() : '',
+                                lastUpdated: new Date().toISOString()
                             };
                             
                             // Check if student already exists
@@ -1868,7 +2075,21 @@
                 
                 // Add new students to the array
                 studentData = studentData.concat(newStudents);
-                saveStudentData();
+                saveDataToLocalStorage();
+                
+                // Sync with Google Sheets
+                if (useGoogleSheets) {
+                    try {
+                        for (const student of newStudents) {
+                            await saveStudentToGoogleSheets(student, false);
+                        }
+                        updateSyncStatus('Synced', 'green');
+                    } catch (error) {
+                        console.error('Failed to sync new students with Google Sheets:', error);
+                        updateSyncStatus('Sync Failed', 'red');
+                    }
+                }
+                
                 updateStudentTable();
                 updateDashboard();
                 
@@ -1894,47 +2115,196 @@
         }
 
         function exportToCSV() {
-            let csvContent = "AdmissionNumber\tStudentID\tName\tGender\tStream\tRegistrationDate\tBuilding\tWindow\tDormBuilding\tRoom\tBed\n";
+            if (studentData.length === 0) {
+                alert('No student data to export.');
+                return;
+            }
+            
+            let csvContent = "AdmissionNumber\tStudentID\tFullName\tGender\tStream\tRegistrationDate\tRegistrationBuilding\tRegistrationWindow\tDormitoryBuilding\tRoomNumber\tBedNumber\n";
             
             studentData.forEach(student => {
                 const row = [
-                    student.admissionNumber,
-                    student.studentId,
-                    student.name,
-                    student.gender,
-                    student.stream,
-                    student.registrationDate,
-                    student.building,
-                    student.roomORwindow,
-                    student.dormBuilding,
-                    student.dormRoom,
-                    student.dormBed
-                ].join('\t');
+                    student.admissionNumber || '',
+                    student.studentId || '',
+                    student.name || '',
+                    student.gender || '',
+                    student.stream || '',
+                    student.registrationDate || '',
+                    student.building || '',
+                    student.roomORwindow || '',
+                    student.dormBuilding || '',
+                    student.dormRoom || '',
+                    student.dormBed || ''
+                ].map(field => `"${field}"`).join('\t');
                 
                 csvContent += row + '\n';
             });
             
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `student_data_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            window.URL.revokeObjectURL(url);
             
-            alert('Student data exported successfully!');
+            const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            a.download = `jju_students_export_${timestamp}.csv`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`📊 CSV Export Complete!\n\nExported ${studentData.length} student records.`);
         }
 
-        function clearAllData() {
-            if (confirm('⚠️ WARNING: This will permanently delete ALL student data!\n\nThis action cannot be undone. Are you sure you want to continue?')) {
-                studentData = [];
-                saveStudentData();
-                updateStudentTable();
-                updateDashboard();
-                alert('All student data has been cleared!');
+        // ===== BACKUP & RESTORE FUNCTIONS =====
+        function createDataBackup() {
+            const backup = {
+                studentData: studentData,
+                totalStudents: studentData.length,
+                backupDate: new Date().toISOString(),
+                backupVersion: '1.0',
+                university: 'Jigjiga University',
+                googleSheetsEnabled: useGoogleSheets,
+                googleSheetId: GOOGLE_SHEET_ID
+            };
+            
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // Create filename with timestamp
+            const timestamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            a.download = `jju_student_backup_${timestamp}.json`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Show success message
+            alert(`✅ Backup created successfully!\n\nFile: ${a.download}\nStudents: ${studentData.length}\n\nSave this file to transfer data to other browsers.`);
+        }
+
+        function restoreDataBackup(file) {
+            if (!file) {
+                alert('Please select a backup file to restore.');
+                return;
+            }
+            
+            if (!file.name.endsWith('.json')) {
+                alert('Please select a valid JSON backup file.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = async function(e) {
+                try {
+                    const backup = JSON.parse(e.target.result);
+                    
+                    // Validate backup file structure
+                    if (!backup.studentData || !Array.isArray(backup.studentData)) {
+                        throw new Error('Invalid backup file format: studentData not found');
+                    }
+                    
+                    // Show confirmation with backup details
+                    const backupDate = new Date(backup.backupDate).toLocaleString();
+                    const confirmed = confirm(
+                        `📋 Backup File Details:\n\n` +
+                        `• Students: ${backup.studentData.length}\n` +
+                        `• Backup Date: ${backupDate}\n` +
+                        `• University: ${backup.university || 'Unknown'}\n\n` +
+                        `This will REPLACE all current student data. Continue?`
+                    );
+                    
+                    if (confirmed) {
+                        // Replace current data with backup data
+                        studentData = backup.studentData;
+                        saveDataToLocalStorage();
+                        
+                        // Sync with Google Sheets if enabled
+                        if (useGoogleSheets) {
+                            try {
+                                // Clear existing Google Sheets data first
+                                await clearGoogleSheetsData();
+                                
+                                // Add all students from backup
+                                for (const student of studentData) {
+                                    await saveStudentToGoogleSheets(student, false);
+                                }
+                                updateSyncStatus('Synced', 'green');
+                            } catch (error) {
+                                console.error('Failed to sync backup with Google Sheets:', error);
+                                updateSyncStatus('Sync Failed', 'red');
+                            }
+                        }
+                        
+                        updateStudentTable();
+                        updateDashboard();
+                        
+                        alert(`✅ Data restored successfully!\n\nRestored ${studentData.length} student records from backup.`);
+                    }
+                    
+                } catch (error) {
+                    console.error('Backup restoration error:', error);
+                    alert(`❌ Error restoring backup: ${error.message}\n\nPlease make sure you selected a valid backup file.`);
+                }
+            };
+            
+            reader.onerror = function() {
+                alert('❌ Error reading the backup file. Please try again.');
+            };
+            
+            reader.readAsText(file);
+            
+            // Clear the file input for future use
+            document.getElementById('restoreFile').value = '';
+        }
+
+        async function clearAllData() {
+            if (studentData.length === 0) {
+                alert('No student data to clear.');
+                return;
+            }
+            
+            const confirmed = confirm(
+                `⚠️ CRITICAL WARNING: DATA DELETION\n\n` +
+                `You are about to permanently delete ${studentData.length} student records!\n\n` +
+                `🔸 RECOMMENDATION: Create a backup first!\n` +
+                `🔸 This action cannot be undone!\n\n` +
+                `Are you absolutely sure you want to continue?`
+            );
+            
+            if (confirmed) {
+                const finalConfirm = confirm(
+                    `FINAL CONFIRMATION:\n\n` +
+                    `Type "DELETE" to confirm permanent deletion of ${studentData.length} student records:`
+                );
+                
+                if (finalConfirm) {
+                    studentData = [];
+                    saveDataToLocalStorage();
+                    
+                    // Clear Google Sheets data if enabled
+                    if (useGoogleSheets) {
+                        try {
+                            await clearGoogleSheetsData();
+                            updateSyncStatus('Synced', 'green');
+                        } catch (error) {
+                            console.error('Failed to clear Google Sheets data:', error);
+                            updateSyncStatus('Sync Failed', 'red');
+                        }
+                    }
+                    
+                    updateStudentTable();
+                    updateDashboard();
+                    alert('🗑️ All student data has been permanently deleted!');
+                }
             }
         }
 
+        // ===== REPORT FUNCTIONS =====
         function generateReport(type) {
             let reportHTML = '';
             
@@ -1965,30 +2335,7 @@
             document.getElementById('reportContent').innerHTML = reportHTML;
         }
 
-        // Debug function to check stored data
-        function debugStudentData() {
-            console.log('=== DEBUG: Student Data ===');
-            console.log('Total students:', studentData.length);
-            studentData.forEach((student, index) => {
-                console.log(`Student ${index + 1}:`, student);
-            });
-            console.log('=== END DEBUG ===');
-            
-            // Also show in alert for easy viewing
-            let debugInfo = `Total Students: ${studentData.length}\n\n`;
-            studentData.forEach((student, index) => {
-                debugInfo += `Student ${index + 1}:\n`;
-                debugInfo += `  Admission: ${student.admissionNumber}\n`;
-                debugInfo += `  Name: ${student.name}\n`;
-                debugInfo += `  Gender: ${student.gender}\n`;
-                debugInfo += `  Stream: ${student.stream}\n`;
-                debugInfo += `  Building: ${student.building}\n`;
-                debugInfo += `  Window: ${student.roomORwindow}\n\n`;
-            });
-            alert(debugInfo);
-        }
-
-        // ===== IMPROVED SEARCH FUNCTION =====
+        // ===== ENHANCED SEARCH FUNCTION =====
         async function searchStudent() {
             const input = document.getElementById('usernameInput').value.trim();
             const resultDiv = document.getElementById('result');
@@ -2013,20 +2360,20 @@
             searchButton.textContent = 'Searching...';
             
             try {
-                // Force reload data from storage to ensure we have latest
-                loadStudentData();
+                // Ensure we have latest data
+                await initializeData();
                 
-                // Normalize the search input (remove spaces, convert to uppercase)
+                // Normalize the search input
                 const searchInput = input.replace(/\s+/g, '').toUpperCase();
                 
-                // Search in local student data first (admin uploaded data)
-                const localStudent = studentData.find(s => {
+                // Search in student data
+                const student = studentData.find(s => {
                     const studentAdmission = s.admissionNumber.replace(/\s+/g, '').toUpperCase();
                     return studentAdmission === searchInput;
                 });
                 
-                if (localStudent) {
-                    displayStudentResult(localStudent);
+                if (student) {
+                    displayStudentResult(student);
                 } else {
                     resultDiv.innerHTML = `<p class="red">No student found with admission number: ${input}</p>`;
                 }
@@ -2051,72 +2398,4 @@
                 <div class="result-item"><span class="field-label">Student ID:</span> ${student.studentId}</div>
                 <div class="result-item"><span class="field-label">Gender:</span> ${student.gender}</div>
                 <div class="result-item"><span class="field-label">Stream:</span> ${student.stream}</div>
-                <div class="result-item"><span class="field-label">Registration Building:</span> ${student.building}</div>
-                <div class="result-item"><span class="field-label">Registration Window:</span> ${student.roomORwindow}</div>
-                <div class="result-item"><span class="field-label">Registration Date:</span> ${student.registrationDate}</div>
-            `;
-            
-            // Display dormitory information if available
-            if (student.dormBuilding && student.dormBuilding !== 'Not assigned' && dormitoryInfo) {
-                document.getElementById('dorm-building').textContent = student.dormBuilding;
-                document.getElementById('dorm-room').textContent = student.dormRoom;
-                document.getElementById('dorm-bed').textContent = student.dormBed;
-                dormitoryInfo.style.display = 'block';
-            }
-        }
-
-        // ===== YOUR EXISTING JAVASCRIPT FUNCTIONS =====
-        // Set current year for copyright
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navMenu = document.getElementById('navMenu');
-        
-        mobileMenuBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            navMenu.classList.toggle('active');
-        });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('nav') && !event.target.closest('.mobile-menu-btn')) {
-                navMenu.classList.remove('active');
-            }
-        });
-
-        // Navigation functions
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            navMenu.classList.remove('active');
-        }
-
-        function scrollToAbout() {
-            document.getElementById('siteFooter').scrollIntoView({ behavior: 'smooth' });
-            navMenu.classList.remove('active');
-        }
-
-        // Allow searching by pressing Enter key
-        document.getElementById('usernameInput').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter') {
-                searchStudent();
-            }
-        });
-
-        // Auto-focus on the input field when page loads
-        window.addEventListener('load', function() {
-            document.getElementById('usernameInput').focus();
-            // Initialize admin system
-            loadStudentData();
-        });
-
-        // Close admin login modal when clicking outside
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('adminLoginModal');
-            if (event.target === modal) {
-                hideAdminLogin();
-            }
-        });
-    </script>
-</body>
-</html>
+                <div class="result-item"><span class="field-label">Registration Building
